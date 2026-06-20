@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBB Annotator - YOLO OBB Export</title>
+    <script type="text/javascript"
+        src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=oNPMpAz1grYNikr4XroL2TKq85rsAqe_MlPwnd6qvwNXbV7yjPn9F_JlL05oBI0PYwh1cByNFVKkdvvdCeUaZLKAabchXxYB54yFsQvxgz32x8ulCulIFhiArpiW2lOIO-F6uVqkGD23efvBdQ7xHFg5hjxNXohoYo9mIyNorE7YmBABPjiinhXT61c0hjuybISB7Wi4Yd1Esb-J882wu6NhWWM5ZnGbqC_R9US_pe7VMNRS2tIDIjXMBP7KQJMrY_P6xcN0UKsycp7QTaM4zKpCuTbXzegukofwOp-GPuk-e0F3ycgPGUR9_qT6-h3SJH4U5B-ddSo8lL6ahTACML_l4PSjXJMsUv5wLPzlTbG07TDnC8Y9lAoaSbQq-gimmJfKr3Cc9UyjrLopSUZddUDDkweu3JGi_-UZEKlIbSDIats7VWIOKeeeQDTUSUHkSCs3sL9evJPPKdXQXLYZxVE_ij8Gzq5sjSorR6qMs_GmwBYck32ZbchxMgxPD9WlC4mfCUEQ7xNKgwtXQxDx0Qw-D4YmzLj9tWdT0bAIXalOredGwW4nofbpVnCNFaarwJp4CWb9CvxUPsR49orS3kiVGog8i2iDr1NYirrjD2rIJLE2ozmGRhDZsykezCCArxtacx-gMoh6_WSjsXeE87bRRTysDHftNRfBesG3AXZWjmGpJ6KPpzErTRfbGvurpQtleojqvnj2WnaS68jjAliX89m1_v3IGI5MRYx2Cuf1xYa9D6FyQp_5ukconkAk6xcXJ85LP1IeejrJiECIOCU_CL5MeRtxjRASqUtoI99SO4KFwRbE8bomep81rciWhWwovShpfRa84DVdn_ijMY6lv0s11pPmBhiUJQW92hbWRIdgICxBDWdnr1xGgLcPBdsYfOEf05XGROY4ws-2dyp9Jv1IJGjkCywlA5VpVyhEIsADtTYt7G2xYYKoXSb96X68MskARgAxeSRince4D3AaCBZDB-fo6Jqg7fEBmtU-XDmfXG5jdrnLddHGcWy6IMa93cPAx1wG5FYF8AfKL6LnQDaC9Vtw8_Cj3QuACrCP186VeBomcUmEitr6vKkucQhwSMkWzSt10qPbIxH3YG7Kh7ivBggQy0aJA0NhR8TxLtQXh3vQcl2QvwYQyMUep3tdfX37wQNmjWV4gjn2BGISAJJk8pHr4Y1kSC476b7GAogpxhdEeD2jnsOwfrcbWVoNFtzfxS9rKySBMTgRk4TwMTHquePY63TrC3CwDDXVBYEwjfKX5RUHtRjRLh_A_CH2dOSRqtdAH_Zysfzq6NohnUVVjpV_TDVBDd9JKrE3kLQekBLoIHL8j3KBGNpBKxQiim-sp0eyOJbxGThgyB414jO6SVGMjuyTKd9N_cKGmVO0Yj0PXr9r2-ksYm_f93zS3ceidxUssho__cyCEiaevgZ22KMHoSyjq9jXt9VeR6BjsY2p9IdXKid68B3_2k56zB1XbZKrd4ao2lFvq3tQ2cv_e5u6sSJfynTaEAFdCkArqjT0koOJftt8cJH73lb0CN_8Ll19kaXlSD6XMpwh5rF7ATXfweYMfKEntuXLi1u6xeFSVjR6HCenouOoJPeaKmbqOo_Z7hAGTqKYP1_3NpK4QD9daqiGLnT2WEPZwQzdUFUFWpz36oRKuDD2"
+        nonce="272703ab28c978a8949fa3fa4fa17433" charset="UTF-8"></script>
+    <style>
+        :root {
+            --bg-color: #1e1e24;
+            --panel-bg: #2b2b36;
+            --text-color: #e0e0e0;
+            --border-color: #40404a;
+            --primary: #5c67ff;
+            --primary-hover: #4a54e8;
+            --success: #28a745;
+            --success-hover: #218838;
+            --danger: #dc3545;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Tabs */
+        .tabs-header {
+            display: flex;
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        .tab-btn {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #888;
+            border-bottom: 3px solid transparent;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .tab-btn.active {
+            color: white;
+            border-bottom-color: var(--primary);
+        }
+        .tab-btn:hover:not(.active) {
+            color: #ccc;
+        }
+        .tab-content {
+            display: none;
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+        }
+        .tab-content.active {
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section h2 {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button.success {
+            background-color: var(--success);
+        }
+
+        button.success:hover {
+            background-color: var(--success-hover);
+        }
+
+        .status-text {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        /* Classes */
+        .class-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .class-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .class-item.active {
+            border-color: var(--primary);
+            background-color: rgba(92, 103, 255, 0.1);
+        }
+
+        .class-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .add-class {
+            display: flex;
+            gap: 5px;
+        }
+
+        .add-class input {
+            flex: 1;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: white;
+        }
+
+        .add-class button {
+            width: auto;
+            margin: 0;
+        }
+
+        /* Main Area */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* OCR Input Area */
+        #ocr-input-area {
+            height: 100px;
+            background-color: var(--panel-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            gap: 10px;
+        }
+        #ocr-text {
+            flex: 1;
+            height: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: white;
+            font-size: 1rem;
+            resize: none;
+        }
+
+        #toolbar {
+            height: 60px;
+            background-color: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #toolbar button {
+            width: auto;
+            margin: 0;
+        }
+
+        #progress-text {
+            font-weight: bold;
+        }
+
+        #canvas-container {
+            flex: 1;
+            position: relative;
+            background-color: #111;
+            overflow: auto;
+            text-align: center;
+        }
+
+        #canvas-container::before {
+            content: '';
+            display: inline-block;
+            height: 100%;
+            vertical-align: middle;
+        }
+
+        canvas {
+            cursor: crosshair;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        /* Instructions Overlay */
+        #instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            pointer-events: none;
+        }
+
+        .key {
+            background: #444;
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: white;
+            font-family: monospace;
+        }
+
+        /* Custom Context Menu */
+        .custom-context-menu {
+            position: absolute;
+            z-index: 1000;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 5px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            display: none;
+            min-width: 150px;
+        }
+        .custom-context-menu .menu-item {
+            padding: 8px 15px;
+            cursor: pointer;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .custom-context-menu .menu-item:hover {
+            background: var(--primary);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="tabs-header">
+        <div class="tab-btn active" id="tab-btn-obb" onclick="switchTab('obb')">OBB Annotation</div>
+        <div class="tab-btn" id="tab-btn-ocr" onclick="switchTab('ocr')">OCR Annotation</div>
+    </div>
+
+    <div class="tab-content active" id="tab-content-obb">
+        <div class="sidebar">
+            <h1>OBB Annotator</h1>
+
+            <div class="section">
+                <h2>Folders</h2>
+                <button id="btn-input">1. Select Image Input Folder</button>
+                <div id="input-status" class="status-text">No folder selected.</div>
+
+                <button id="btn-output">2. Select Output Folder</button>
+                <div id="output-status" class="status-text">No folder selected.</div>
+
+                <button id="btn-input-labels">3. Select Label Input Folder</button>
+                <div id="input-labels-status" class="status-text">No folder selected.</div>
+            </div>
+
+            <div class="section">
+                <h2>Export Settings</h2>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <input type="checkbox" id="chk-resize" checked />
+                    <label for="chk-resize" style="font-size: 0.9rem;">Resize Output Image</label>
+                </div>
+                <div style="display: flex; gap: 5px; align-items: center;" id="resize-inputs">
+                    <input type="number" id="resize-width" value="640" style="width: 60px; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: white; text-align: center;" />
+                    <span style="font-size: 0.9rem;">x</span>
+                    <input type="number" id="resize-height" value="640" style="width: 60px; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: white; text-align: center;" />
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Classes</h2>
+                <div class="class-list" id="class-list">
+                    <!-- Classes injected here -->
+                </div>
+                <div class="add-class">
+                    <input type="text" id="new-class-name" placeholder="New class name..." />
+                    <button id="btn-add-class">+</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Annotations in current image</h2>
+                <div class="status-text" id="annot-count">0 annotations</div>
+            </div>
+        </div>
+
+        <div class="main-area">
+            <div id="toolbar">
+                <div class="toolbar-group">
+                    <button id="btn-prev">⬅ Previous (P)</button>
+                    <span id="progress-text">0 / 0</span>
+                    <button id="btn-skip" style="background-color: #888;">Skip (S) ➡</button>
+                    <button id="btn-next" class="success">Validate & Next (N / Tab) ➡</button>
+                </div>
+                <div class="toolbar-group">
+                    <div class="status-text" style="margin:0; font-size:1rem;" id="filename-display"></div>
+                </div>
+            </div>
+
+            <div id="canvas-container">
+                <canvas id="canvas"></canvas>
+            </div>
+            <div id="instructions">
+                <strong>Controls:</strong><br>
+                Right-Click or <span class="key">Space</span>+Click on image to pan.<br>
+                <span class="key">Ctrl</span> + <span class="key">Wheel</span> Zoom in/out<br>
+                <span class="key">Del</span> / <span class="key">Bksp</span> Delete selected box<br>
+                <span class="key">N</span> / <span class="key">Tab</span> Validate & Next image<br>
+                <span class="key">P</span> Previous image<br>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="tab-content-ocr">
+        <div class="sidebar">
+            <h1>OCR Annotator</h1>
+
+            <div class="section">
+                <h2>Dossiers & Fichiers</h2>
+                <input type="file" id="ocr-dir-input" webkitdirectory directory multiple style="display: none;">
+                <button id="ocr-btn-select-dir">1. Sélectionner le dossier d'images</button>
+                <div id="ocr-dir-status" class="status-text">Aucun dossier sélectionné.</div>
+
+                <input type="file" id="ocr-csv-input" accept=".csv" style="display: none;">
+                <button id="ocr-btn-select-csv">2. Sélectionner labels.csv</button>
+                <div id="ocr-csv-status" class="status-text">Aucun fichier sélectionné.</div>
+
+                <button id="ocr-btn-download-csv" class="success" style="margin-top: 15px;">Télécharger labels.csv</button>
+            </div>
+
+            <div class="section">
+                <h2>Field Type</h2>
+                <select id="ocr-field-type" style="width: 100%; padding: 5px; background: var(--bg-color); color: white; border: 1px solid var(--border-color); border-radius: 4px;">
+                    <option value="NOM">NOM</option>
+                    <option value="PRENOM">PRENOM</option>
+                    <option value="DATE_EXPIRATION">DATE EXPIRATION</option>
+                    <option value="NUMERO_CARTE">NUMERO CARTE</option>
+                </select>
+            </div>
+
+            <div class="section">
+                <h2>Export Settings</h2>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <input type="checkbox" id="ocr-chk-resize" checked />
+                    <label for="ocr-chk-resize" style="font-size: 0.9rem;">Resize Output Image</label>
+                </div>
+                <div style="display: flex; gap: 5px; align-items: center;" id="ocr-resize-inputs">
+                    <input type="number" id="ocr-resize-width" value="640" style="width: 60px; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: white; text-align: center;" />
+                    <span style="font-size: 0.9rem;">x</span>
+                    <input type="number" id="ocr-resize-height" value="640" style="width: 60px; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: white; text-align: center;" />
+                </div>
+            </div>
+        </div>
+
+        <div class="main-area">
+            <div id="toolbar" style="border-bottom: 1px solid var(--border-color);">
+                <div class="toolbar-group">
+                    <button id="ocr-btn-prev">⬅ Previous</button>
+                    <span id="ocr-progress-text">0 / 0</span>
+                    <button id="ocr-btn-skip" style="background-color: #888;">Skip (Ctrl+Enter) ➡</button>
+                    <button id="ocr-btn-next" class="success">Save & Next (Enter) ➡</button>
+                </div>
+                <div class="toolbar-group">
+                    <div class="status-text" style="margin:0; font-size:1rem;" id="ocr-filename-display"></div>
+                </div>
+            </div>
+
+            <div id="ocr-canvas-container" style="flex: 1; position: relative; background-color: #111; overflow: auto; text-align: center;">
+                <canvas id="ocr-canvas" style="box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); display: inline-block; vertical-align: middle;"></canvas>
+            </div>
+            
+            <div id="ocr-input-area">
+                <textarea id="ocr-text" placeholder="Type visible text here..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Context Menu -->
+    <div id="ocr-context-menu" class="custom-context-menu">
+        <div class="menu-item" onclick="ocrContextMenuAction('uppercase')">Mettre en majuscule</div>
+        <div class="menu-item" onclick="ocrContextMenuAction('copy')">Copier</div>
+        <div class="menu-item" onclick="ocrContextMenuAction('cut')">Couper</div>
+        <div class="menu-item" onclick="ocrContextMenuAction('paste')">Coller</div>
+        <div class="menu-item" style="color: #ff6b6b;" onclick="ocrContextMenuAction('delete')">Supprimer</div>
+    </div>
+
+    <script>
+        /**
+         * Application State
+         */
+        const state = {
+            inputDirHandle: null,
+            outputDirHandle: null,
+            inputLabelsDirHandle: null,
+            imageFiles: [], // Array of FileSystemFileHandle
+            currentIndex: -1,
+            currentImageElement: null,
+
+            classes: [
+                { id: 0, name: 'text', color: '#ff3333' }
+            ],
+            activeClassId: 0,
+
+            annotations: {}, // filename -> array of OBBs
+
+            // Canvas & Interaction
+            scale: 1,
+            zoom: 1,
+            offsetX: 0,
+            offsetY: 0,
+            selectedBoxIndex: -1,
+
+            mode: 'idle', // idle, drawing, moving, resizing, rotating
+            startX: 0,
+            startY: 0,
+            currentBox: null,
+            activeHandle: null // 'tl', 'tr', 'bl', 'br', 'rotate'
+        };
+
+        // DOM Elements
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvas-container');
+
+        /**
+         * File System Logic
+         */
+        async function filterObbImages() {
+            if (!state.inputDirHandle || !state.outputDirHandle || state.imageFiles.length === 0) return;
+
+            try {
+                const labelsDir = await state.outputDirHandle.getDirectoryHandle('labels');
+                const annotatedNames = new Set();
+                for await (const entry of labelsDir.values()) {
+                    if (entry.kind === 'file' && entry.name.endsWith('.txt')) {
+                        annotatedNames.add(entry.name);
+                    }
+                }
+
+                const originalLength = state.imageFiles.length;
+                state.imageFiles = state.imageFiles.filter(file => {
+                    const txtName = file.name.replace(/\.[^/.]+$/, ".txt");
+                    return !annotatedNames.has(txtName);
+                });
+
+                if (state.imageFiles.length !== originalLength) {
+                    if (state.imageFiles.length > 0) {
+                        state.currentIndex = 0;
+                        updateProgress();
+                        await loadImage(state.imageFiles[state.currentIndex]);
+                    } else {
+                        state.currentIndex = -1;
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        document.getElementById('progress-text').innerText = `0 / 0`;
+                        document.getElementById('filename-display').innerText = "";
+                        document.getElementById('annot-count').innerText = "0 annotations";
+                        alert("Toutes les images OBB sont déjà labélisées.");
+                    }
+                }
+            } catch (e) {
+                console.error("Error filtering OBB images:", e);
+            }
+        }
+
+        async function selectInputDir() {
+            try {
+                const handle = await window.showDirectoryPicker();
+                state.inputDirHandle = handle;
+                document.getElementById('input-status').innerText = handle.name;
+
+                state.imageFiles = [];
+                for await (const entry of handle.values()) {
+                    if (entry.kind === 'file' && entry.name.match(/\.(jpe?g|png|webp)$/i)) {
+                        state.imageFiles.push(entry);
+                    }
+                }
+
+                if (state.imageFiles.length > 0) {
+                    state.currentIndex = 0;
+                    if (state.outputDirHandle) {
+                        await filterObbImages();
+                    } else {
+                        updateProgress();
+                        await loadImage(state.imageFiles[state.currentIndex]);
+                    }
+                } else {
+                    alert("No images found in selected folder.");
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function selectInputLabelsDir() {
+            try {
+                const handle = await window.showDirectoryPicker();
+                state.inputLabelsDirHandle = handle;
+                document.getElementById('input-labels-status').innerText = handle.name;
+
+                if (state.currentIndex !== -1 && state.imageFiles.length > 0) {
+                    const filename = state.imageFiles[state.currentIndex].name;
+                    await tryLoadExistingAnnotations(filename);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function selectOutputDir() {
+            try {
+                const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                state.outputDirHandle = handle;
+                document.getElementById('output-status').innerText = handle.name;
+
+                // Ensure subdirectories exist
+                await handle.getDirectoryHandle('images', { create: true });
+                await handle.getDirectoryHandle('labels', { create: true });
+
+                if (state.inputDirHandle) {
+                    await filterObbImages();
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function loadImage(fileHandle) {
+            const file = await fileHandle.getFile();
+            const url = URL.createObjectURL(file);
+
+            const img = new Image();
+            img.onload = () => {
+                state.currentImageElement = img;
+
+                // Ensure annotations array exists for this file
+                if (!state.annotations[file.name]) {
+                    state.annotations[file.name] = [];
+                    tryLoadExistingAnnotations(file.name);
+                }
+
+                state.selectedBoxIndex = -1;
+                state.zoom = 1;
+                fitCanvas();
+                render();
+                updateUI();
+            };
+            img.src = url;
+            document.getElementById('filename-display').innerText = file.name;
+        }
+
+        async function tryLoadExistingAnnotations(filename) {
+            let fileHandle = null;
+            const txtName = filename.replace(/\.[^/.]+$/, ".txt");
+
+            if (state.outputDirHandle) {
+                try {
+                    const labelsDir = await state.outputDirHandle.getDirectoryHandle('labels');
+                    fileHandle = await labelsDir.getFileHandle(txtName);
+                } catch (e) { }
+            }
+
+            if (!fileHandle && state.inputLabelsDirHandle) {
+                try {
+                    fileHandle = await state.inputLabelsDirHandle.getFileHandle(txtName);
+                } catch (e) { }
+            }
+
+            if (!fileHandle) return;
+
+            try {
+                const file = await fileHandle.getFile();
+                const text = await file.text();
+
+                const lines = text.trim().split('\n');
+                const loadedBoxes = [];
+                const w = state.currentImageElement.width;
+                const h = state.currentImageElement.height;
+
+                for (let line of lines) {
+                    if (!line.trim()) continue;
+                    const parts = line.trim().split(/\s+/).map(Number);
+                    if (parts.length >= 9) { // YOLO OBB: class x1 y1 x2 y2 x3 y3 x4 y4
+                        const classId = parts[0];
+                        const x1 = parts[1] * w, y1 = parts[2] * h;
+                        const x2 = parts[3] * w, y2 = parts[4] * h;
+                        const x3 = parts[5] * w, y3 = parts[6] * h;
+                        const x4 = parts[7] * w, y4 = parts[8] * h;
+
+                        // Approximation for center
+                        const cx = (x1 + x2 + x3 + x4) / 4;
+                        const cy = (y1 + y2 + y3 + y4) / 4;
+
+                        const width = Math.hypot(x2 - x1, y2 - y1);
+                        const height = Math.hypot(x3 - x2, y3 - y2);
+                        const angle = Math.atan2(y2 - y1, x2 - x1);
+
+                        loadedBoxes.push({ cx, cy, width, height, angle, classId });
+                    }
+                }
+                state.annotations[filename] = loadedBoxes;
+                render();
+                updateUI();
+            } catch (e) {
+                // Normal if file doesn't exist
+            }
+        }
+
+        async function validateAndSave() {
+            if (!state.outputDirHandle || state.currentIndex === -1) {
+                alert("Please select output directory first.");
+                return;
+            }
+
+            const fileHandle = state.imageFiles[state.currentIndex];
+            const filename = fileHandle.name;
+            const boxes = state.annotations[filename] || [];
+            const imgWidth = state.currentImageElement.width;
+            const imgHeight = state.currentImageElement.height;
+
+            try {
+                const imagesDir = await state.outputDirHandle.getDirectoryHandle('images', { create: true });
+                const labelsDir = await state.outputDirHandle.getDirectoryHandle('labels', { create: true });
+
+                // 1. Copy or Resize Image
+                const file = await fileHandle.getFile();
+                const destImgHandle = await imagesDir.getFileHandle(filename, { create: true });
+                const imgWritable = await destImgHandle.createWritable();
+                
+                const doResize = document.getElementById('chk-resize').checked;
+                if (doResize) {
+                    const tgtW = parseInt(document.getElementById('resize-width').value) || 640;
+                    const tgtH = parseInt(document.getElementById('resize-height').value) || 640;
+                    
+                    const offCanvas = document.createElement('canvas');
+                    offCanvas.width = tgtW;
+                    offCanvas.height = tgtH;
+                    const offCtx = offCanvas.getContext('2d');
+                    offCtx.drawImage(state.currentImageElement, 0, 0, tgtW, tgtH);
+                    
+                    const blob = await new Promise(resolve => {
+                        const ext = filename.split('.').pop().toLowerCase();
+                        let mime = 'image/jpeg';
+                        if (ext === 'png') mime = 'image/png';
+                        else if (ext === 'webp') mime = 'image/webp';
+                        offCanvas.toBlob(resolve, mime, 0.95);
+                    });
+                    await imgWritable.write(blob);
+                } else {
+                    await imgWritable.write(file);
+                }
+                await imgWritable.close();
+
+                // 2. Save Label
+                let labelText = "";
+                for (let b of boxes) {
+                    const corners = getOBBCorners(b);
+                    // Normalize corners
+                    const norm = corners.map(pt => ({ x: pt.x / imgWidth, y: pt.y / imgHeight }));
+                    labelText += `${b.classId} ${norm[0].x.toFixed(6)} ${norm[0].y.toFixed(6)} ${norm[1].x.toFixed(6)} ${norm[1].y.toFixed(6)} ${norm[2].x.toFixed(6)} ${norm[2].y.toFixed(6)} ${norm[3].x.toFixed(6)} ${norm[3].y.toFixed(6)}\n`;
+                }
+
+                const txtName = filename.replace(/\.[^/.]+$/, ".txt");
+                const destTxtHandle = await labelsDir.getFileHandle(txtName, { create: true });
+                const txtWritable = await destTxtHandle.createWritable();
+                await txtWritable.write(labelText);
+                await txtWritable.close();
+
+            } catch (e) {
+                console.error("Save failed", e);
+                alert("Failed to save: " + e.message);
+                return;
+            }
+        }
+
+        async function nextImage() {
+            if (state.currentIndex < state.imageFiles.length - 1) {
+                await validateAndSave(); // Auto save
+                state.currentIndex++;
+                updateProgress();
+                await loadImage(state.imageFiles[state.currentIndex]);
+            } else {
+                await validateAndSave();
+                alert("Finished all images!");
+            }
+        }
+
+        async function skipImage() {
+            if (state.currentIndex < state.imageFiles.length - 1) {
+                state.currentIndex++;
+                updateProgress();
+                await loadImage(state.imageFiles[state.currentIndex]);
+            } else {
+                alert("Finished all images! (Skipped last)");
+            }
+        }
+
+        async function prevImage() {
+            if (state.currentIndex > 0) {
+                state.currentIndex--;
+                updateProgress();
+                await loadImage(state.imageFiles[state.currentIndex]);
+            }
+        }
+
+        /**
+         * UI Updates
+         */
+        function updateProgress() {
+            document.getElementById('progress-text').innerText = `${state.currentIndex + 1} / ${state.imageFiles.length}`;
+        }
+
+        function updateUI() {
+            const list = document.getElementById('class-list');
+            list.innerHTML = '';
+            state.classes.forEach(c => {
+                const div = document.createElement('div');
+                div.className = `class-item ${state.activeClassId === c.id ? 'active' : ''}`;
+                div.innerHTML = `<div class="class-color" style="background-color: ${c.color}"></div><span>${c.name}</span>`;
+                div.onclick = () => {
+                    state.activeClassId = c.id;
+                    updateUI();
+                };
+                list.appendChild(div);
+            });
+
+            if (state.currentIndex !== -1) {
+                const filename = state.imageFiles[state.currentIndex].name;
+                const count = state.annotations[filename] ? state.annotations[filename].length : 0;
+                document.getElementById('annot-count').innerText = `${count} annotations`;
+            }
+        }
+
+        document.getElementById('btn-add-class').onclick = () => {
+            const input = document.getElementById('new-class-name');
+            if (input.value.trim()) {
+                const newId = state.classes.length;
+                const color = `hsl(${Math.random() * 360}, 100%, 65%)`;
+                state.classes.push({ id: newId, name: input.value.trim(), color });
+                state.activeClassId = newId;
+                input.value = '';
+                updateUI();
+            }
+        };
+
+        /**
+         * Canvas & OBB Logic
+         */
+        function fitCanvas() {
+            if (!state.currentImageElement) return;
+
+            canvas.style.display = 'none';
+            const cw = container.clientWidth - 40;
+            const ch = container.clientHeight - 40;
+            canvas.style.display = 'inline-block';
+
+            const iw = state.currentImageElement.width;
+            const ih = state.currentImageElement.height;
+
+            const baseScale = Math.min(cw / iw, ch / ih);
+            state.scale = baseScale * state.zoom;
+
+            canvas.width = iw * state.scale;
+            canvas.height = ih * state.scale;
+        }
+
+        window.onresize = () => { fitCanvas(); render(); };
+
+        canvas.addEventListener('wheel', e => {
+            if (!state.currentImageElement) return;
+
+            if (!e.ctrlKey && !rightArrowPressed) {
+                // If Ctrl or Right Arrow is not pressed, let the native scroll happen
+                return;
+            }
+            e.preventDefault();
+
+            const oldRect = canvas.getBoundingClientRect();
+            // Mouse position relative to the top-left of the canvas BEFORE zooming
+            const mouseX = e.clientX - oldRect.left;
+            const mouseY = e.clientY - oldRect.top;
+
+            const oldZoom = state.zoom;
+            // Progressive smooth zoom based on scroll amount
+            const zoomFactor = Math.exp(-e.deltaY * 0.0015);
+            state.zoom *= zoomFactor;
+            state.zoom = Math.max(0.1, Math.min(state.zoom, 20));
+
+            const zoomRatio = state.zoom / oldZoom;
+
+            fitCanvas();
+            render();
+
+            const newRect = canvas.getBoundingClientRect();
+            
+            // Calculate how far the point under the mouse moved on the screen
+            const errorX = (newRect.left + mouseX * zoomRatio) - e.clientX;
+            const errorY = (newRect.top + mouseY * zoomRatio) - e.clientY;
+
+            // Correct the error by adjusting scrollbars
+            container.scrollLeft += errorX;
+            container.scrollTop += errorY;
+        }, { passive: false });
+
+        // Get 4 corners of an OBB (unscaled image coordinates)
+        function getOBBCorners(box) {
+            const cosA = Math.cos(box.angle);
+            const sinA = Math.sin(box.angle);
+            const hw = box.width / 2;
+            const hh = box.height / 2;
+
+            const corners = [
+                { x: -hw, y: -hh },
+                { x: hw, y: -hh },
+                { x: hw, y: hh },
+                { x: -hw, y: hh }
+            ];
+
+            return corners.map(pt => ({
+                x: box.cx + pt.x * cosA - pt.y * sinA,
+                y: box.cy + pt.x * sinA + pt.y * cosA
+            }));
+        }
+
+        function render() {
+            if (!state.currentImageElement) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.scale(state.scale, state.scale);
+
+            // Draw Image
+            ctx.drawImage(state.currentImageElement, 0, 0);
+
+            // Draw Annotations
+            const filename = state.imageFiles[state.currentIndex].name;
+            const boxes = state.annotations[filename] || [];
+
+            boxes.forEach((box, i) => {
+                const isSelected = i === state.selectedBoxIndex;
+                const cls = state.classes.find(c => c.id === box.classId);
+                const color = cls ? cls.color : '#fff';
+
+                ctx.save();
+                ctx.translate(box.cx, box.cy);
+                ctx.rotate(box.angle);
+
+                // Box
+                ctx.strokeStyle = color;
+                ctx.lineWidth = isSelected ? 3 / state.scale : 2 / state.scale;
+                ctx.fillStyle = color + '33';
+                ctx.beginPath();
+                ctx.rect(-box.width / 2, -box.height / 2, box.width, box.height);
+                ctx.fill();
+                ctx.stroke();
+
+                // Label rendering removed as requested
+
+                // Handles if selected
+                if (isSelected) {
+                    const handleSize = 6 / state.scale;
+                    ctx.fillStyle = '#fff';
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 1 / state.scale;
+
+                    const corners = [
+                        { x: -box.width / 2, y: -box.height / 2 },
+                        { x: box.width / 2, y: -box.height / 2 },
+                        { x: box.width / 2, y: box.height / 2 },
+                        { x: -box.width / 2, y: box.height / 2 },
+                        { x: 0, y: -box.height / 2 },
+                        { x: 0, y: box.height / 2 },
+                        { x: -box.width / 2, y: 0 },
+                        { x: box.width / 2, y: 0 }
+                    ];
+                    corners.forEach(pt => {
+                        ctx.fillRect(pt.x - handleSize / 2, pt.y - handleSize / 2, handleSize, handleSize);
+                        ctx.strokeRect(pt.x - handleSize / 2, pt.y - handleSize / 2, handleSize, handleSize);
+                    });
+
+                    // Rotate handle
+                    const rotDist = 30 / state.scale;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -box.height / 2);
+                    ctx.lineTo(0, -box.height / 2 - rotDist);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.arc(0, -box.height / 2 - rotDist, handleSize, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+            });
+
+            // Draw current creating box
+            if (state.mode === 'drawing' && state.currentBox) {
+                const box = state.currentBox;
+                ctx.save();
+                const cls = state.classes.find(c => c.id === box.classId);
+                ctx.strokeStyle = cls ? cls.color : '#fff';
+                ctx.lineWidth = 2 / state.scale;
+                ctx.setLineDash([5 / state.scale, 5 / state.scale]);
+                ctx.strokeRect(box.x, box.y, box.w, box.h);
+                ctx.restore();
+            }
+
+            ctx.restore();
+        }
+
+        /**
+         * Interactions
+         */
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: (e.clientX - rect.left) / state.scale,
+                y: (e.clientY - rect.top) / state.scale
+            };
+        }
+
+        function isPointInRotatedRect(px, py, box) {
+            const cosA = Math.cos(-box.angle);
+            const sinA = Math.sin(-box.angle);
+            const dx = px - box.cx;
+            const dy = py - box.cy;
+
+            const localX = dx * cosA - dy * sinA;
+            const localY = dx * sinA + dy * cosA;
+
+            const hw = box.width / 2;
+            const hh = box.height / 2;
+
+            return (localX >= -hw && localX <= hw && localY >= -hh && localY <= hh);
+        }
+
+        function hitTest(x, y) {
+            const filename = state.imageFiles[state.currentIndex]?.name;
+            const boxes = state.annotations[filename] || [];
+            const handleSize = 8 / state.scale;
+            const rotDist = 30 / state.scale;
+
+            if (state.selectedBoxIndex !== -1) {
+                const box = boxes[state.selectedBoxIndex];
+                const dx = x - box.cx;
+                const dy = y - box.cy;
+                const lx = dx * Math.cos(-box.angle) - dy * Math.sin(-box.angle);
+                const ly = dx * Math.sin(-box.angle) + dy * Math.cos(-box.angle);
+
+                const hw = box.width / 2;
+                const hh = box.height / 2;
+
+                if (Math.hypot(lx - 0, ly - (-hh - rotDist)) <= handleSize * 1.5) {
+                    return { type: 'rotate', index: state.selectedBoxIndex };
+                }
+
+                if (Math.abs(lx - (-hw)) <= handleSize && Math.abs(ly - (-hh)) <= handleSize) return { type: 'resize', handle: 'tl', index: state.selectedBoxIndex };
+                if (Math.abs(lx - (hw)) <= handleSize && Math.abs(ly - (-hh)) <= handleSize) return { type: 'resize', handle: 'tr', index: state.selectedBoxIndex };
+                if (Math.abs(lx - (hw)) <= handleSize && Math.abs(ly - (hh)) <= handleSize) return { type: 'resize', handle: 'br', index: state.selectedBoxIndex };
+                if (Math.abs(lx - (-hw)) <= handleSize && Math.abs(ly - (hh)) <= handleSize) return { type: 'resize', handle: 'bl', index: state.selectedBoxIndex };
+
+                if (Math.abs(lx - 0) <= handleSize && Math.abs(ly - (-hh)) <= handleSize) return { type: 'resize', handle: 't', index: state.selectedBoxIndex };
+                if (Math.abs(lx - 0) <= handleSize && Math.abs(ly - (hh)) <= handleSize) return { type: 'resize', handle: 'b', index: state.selectedBoxIndex };
+                if (Math.abs(lx - (-hw)) <= handleSize && Math.abs(ly - 0) <= handleSize) return { type: 'resize', handle: 'l', index: state.selectedBoxIndex };
+                if (Math.abs(lx - (hw)) <= handleSize && Math.abs(ly - 0) <= handleSize) return { type: 'resize', handle: 'r', index: state.selectedBoxIndex };
+            }
+
+            for (let i = boxes.length - 1; i >= 0; i--) {
+                if (isPointInRotatedRect(x, y, boxes[i])) {
+                    return { type: 'move', index: i };
+                }
+            }
+
+            return null;
+        }
+
+        canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+        canvas.addEventListener('mousedown', e => {
+            if (!state.currentImageElement) return;
+
+            if (e.button === 1 || e.button === 2 || spacePressed) {
+                e.preventDefault();
+                state.mode = 'panning';
+                state.panStartX = e.clientX;
+                state.panStartY = e.clientY;
+                state.scrollStartX = container.scrollLeft;
+                state.scrollStartY = container.scrollTop;
+                return;
+            }
+
+            const pos = getMousePos(e);
+
+            const hit = hitTest(pos.x, pos.y);
+
+            if (hit) {
+                state.selectedBoxIndex = hit.index;
+                state.mode = hit.type;
+                state.activeHandle = hit.handle;
+                state.startX = pos.x;
+                state.startY = pos.y;
+
+                const box = state.annotations[state.imageFiles[state.currentIndex].name][hit.index];
+                state.initBox = { ...box };
+            } else {
+                state.selectedBoxIndex = -1;
+                state.mode = 'drawing';
+                state.startX = pos.x;
+                state.startY = pos.y;
+                state.currentBox = { x: pos.x, y: pos.y, w: 0, h: 0, classId: state.activeClassId };
+            }
+            render();
+            updateUI();
+        });
+
+        canvas.addEventListener('mousemove', e => {
+            if (state.mode === 'idle') return;
+
+            if (state.mode === 'panning') {
+                const dx = e.clientX - state.panStartX;
+                const dy = e.clientY - state.panStartY;
+                container.scrollLeft = state.scrollStartX - dx;
+                container.scrollTop = state.scrollStartY - dy;
+                return;
+            }
+
+            const pos = getMousePos(e);
+            const filename = state.imageFiles[state.currentIndex].name;
+            const box = state.annotations[filename] ? state.annotations[filename][state.selectedBoxIndex] : null;
+
+            if (state.mode === 'drawing') {
+                state.currentBox.w = pos.x - state.startX;
+                state.currentBox.h = pos.y - state.startY;
+                render();
+            }
+            else if (state.mode === 'move' && box) {
+                const dx = pos.x - state.startX;
+                const dy = pos.y - state.startY;
+                box.cx = state.initBox.cx + dx;
+                box.cy = state.initBox.cy + dy;
+                render();
+            }
+            else if (state.mode === 'rotate' && box) {
+                const angle = Math.atan2(pos.y - box.cy, pos.x - box.cx);
+                box.angle = angle + Math.PI / 2;
+                render();
+            }
+            else if (state.mode === 'resize' && box) {
+                const dx = pos.x - state.initBox.cx;
+                const dy = pos.y - state.initBox.cy;
+                const cosA = Math.cos(-state.initBox.angle);
+                const sinA = Math.sin(-state.initBox.angle);
+                const lx = dx * cosA - dy * sinA;
+                const ly = dx * sinA + dy * cosA;
+
+                let left = -state.initBox.width / 2;
+                let right = state.initBox.width / 2;
+                let top = -state.initBox.height / 2;
+                let bottom = state.initBox.height / 2;
+
+                if (state.activeHandle.includes('l')) left = Math.min(lx, right - 10);
+                if (state.activeHandle.includes('r')) right = Math.max(lx, left + 10);
+                if (state.activeHandle.includes('t')) top = Math.min(ly, bottom - 10);
+                if (state.activeHandle.includes('b')) bottom = Math.max(ly, top + 10);
+
+                box.width = right - left;
+                box.height = bottom - top;
+
+                const lcx = (left + right) / 2;
+                const lcy = (top + bottom) / 2;
+
+                const cosB = Math.cos(state.initBox.angle);
+                const sinB = Math.sin(state.initBox.angle);
+                
+                box.cx = state.initBox.cx + lcx * cosB - lcy * sinB;
+                box.cy = state.initBox.cy + lcx * sinB + lcy * cosB;
+
+                render();
+            }
+        });
+
+        window.addEventListener('mouseup', e => {
+            if (state.mode === 'panning') {
+                state.mode = 'idle';
+                return;
+            }
+
+            if (state.mode === 'drawing' && state.currentBox) {
+                const w = Math.abs(state.currentBox.w);
+                const h = Math.abs(state.currentBox.h);
+                if (w > 10 && h > 10) {
+                    const cx = state.currentBox.x + state.currentBox.w / 2;
+                    const cy = state.currentBox.y + state.currentBox.h / 2;
+                    const filename = state.imageFiles[state.currentIndex].name;
+
+                    state.annotations[filename].push({
+                        cx: cx,
+                        cy: cy,
+                        width: w,
+                        height: h,
+                        angle: 0,
+                        classId: state.activeClassId
+                    });
+                    state.selectedBoxIndex = state.annotations[filename].length - 1;
+                }
+                state.currentBox = null;
+            }
+
+            state.mode = 'idle';
+            render();
+            updateUI();
+        });
+
+        let spacePressed = false;
+        let rightArrowPressed = false;
+        window.addEventListener('keyup', e => {
+            if (e.code === 'Space') spacePressed = false;
+            if (e.key === 'ArrowRight') rightArrowPressed = false;
+        });
+
+        window.addEventListener('keydown', e => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            if (e.code === 'Space') {
+                spacePressed = true;
+                e.preventDefault(); // Prevent scrolling down
+            }
+            if (e.key === 'ArrowRight') {
+                rightArrowPressed = true;
+            }
+
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                if (e.key === 'Backspace') e.preventDefault();
+                if (state.selectedBoxIndex !== -1 && state.currentIndex !== -1) {
+                    const filename = state.imageFiles[state.currentIndex].name;
+                    state.annotations[filename].splice(state.selectedBoxIndex, 1);
+                    state.selectedBoxIndex = -1;
+                    render();
+                    updateUI();
+                }
+            } else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                if (state.selectedBoxIndex !== -1 && state.currentIndex !== -1) {
+                    const filename = state.imageFiles[state.currentIndex].name;
+                    const delta = e.key === 'ArrowRight' ? 2 : -2;
+                    state.annotations[filename][state.selectedBoxIndex].angle += delta * Math.PI / 180;
+                    render();
+                }
+            } else if (e.key.toLowerCase() === 'n' || e.key === 'Tab') {
+                if (e.key === 'Tab') e.preventDefault();
+                nextImage();
+            } else if (e.key.toLowerCase() === 's') {
+                skipImage();
+            } else if (e.key.toLowerCase() === 'p') {
+                prevImage();
+            }
+        });
+
+        document.getElementById('btn-input').onclick = selectInputDir;
+        document.getElementById('btn-output').onclick = selectOutputDir;
+        document.getElementById('btn-input-labels').onclick = selectInputLabelsDir;
+        document.getElementById('btn-next').onclick = nextImage;
+        document.getElementById('btn-skip').onclick = skipImage;
+        document.getElementById('btn-prev').onclick = prevImage;
+
+        document.addEventListener('wheel', e => {
+            if (e.ctrlKey) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        updateUI();
+
+        // --- Tab Switching Logic ---
+        function switchTab(tab) {
+            if (tab !== 'ocr' && typeof ocrState !== 'undefined' && ocrState.hasUnsavedChanges) {
+                const confirmLeave = confirm("Vous avez des modifications non téléchargées dans l'annotateur OCR. Voulez-vous vraiment quitter cette fonctionnalité ?");
+                if (!confirmLeave) {
+                    return;
+                }
+            }
+
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`tab-btn-${tab}`).classList.add('active');
+            document.getElementById(`tab-content-${tab}`).classList.add('active');
+            
+            if (tab === 'ocr') {
+                ocrFitCanvas();
+                ocrRender();
+            } else {
+                fitCanvas();
+                render();
+            }
+        }
+
+        // --- OCR State and Logic ---
+        const ocrState = {
+            allImageFiles: [],
+            imageFiles: [],
+            currentIndex: -1,
+            currentImageElement: null,
+            csvHeaders: ['filename', 'label', 'finalized'],
+            csvData: {},
+            colFilename: 0,
+            colLabel: 1,
+            colFinalized: 2,
+            scale: 1,
+            zoom: 1,
+            hasUnsavedChanges: false
+        };
+
+        const ocrCanvas = document.getElementById('ocr-canvas');
+        const ocrCtx = ocrCanvas.getContext('2d');
+        const ocrContainer = document.getElementById('ocr-canvas-container');
+
+        function parseCSV(text) {
+            const lines = [];
+            let row = [];
+            let col = "";
+            let inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const nextChar = text[i+1];
+                if (inQuotes) {
+                    if (char === '"') {
+                        if (nextChar === '"') {
+                            col += '"';
+                            i++;
+                        } else {
+                            inQuotes = false;
+                        }
+                    } else {
+                        col += char;
+                    }
+                } else {
+                    if (char === '"') {
+                        inQuotes = true;
+                    } else if (char === ',') {
+                        row.push(col);
+                        col = "";
+                    } else if (char === '\r' || char === '\n') {
+                        row.push(col);
+                        col = "";
+                        if (row.length > 0 && (row.length > 1 || row[0] !== "")) {
+                            lines.push(row);
+                        }
+                        row = [];
+                        if (char === '\r' && nextChar === '\n') {
+                            i++;
+                        }
+                    } else {
+                        col += char;
+                    }
+                }
+            }
+            if (col !== "" || row.length > 0) {
+                row.push(col);
+                lines.push(row);
+            }
+            return lines;
+        }
+
+        function ocrParseCsvContent(text) {
+            const cleanText = text.startsWith('\uFEFF') ? text.slice(1) : text;
+            const rows = parseCSV(cleanText);
+            if (rows.length === 0) {
+                ocrState.csvHeaders = ['filename', 'label', 'finalized'];
+                ocrState.csvData = {};
+                return;
+            }
+
+            const firstRow = rows[0];
+            const hasImageExt = /\.(jpe?g|png|webp|gif|bmp)$/i.test(firstRow[0]);
+            
+            let headerRow;
+            let dataRows;
+            if (hasImageExt) {
+                headerRow = ['filename', 'label', 'finalized'];
+                dataRows = rows;
+            } else {
+                headerRow = firstRow;
+                dataRows = rows.slice(1);
+            }
+
+            ocrState.csvHeaders = headerRow.map(h => h.trim());
+
+            let colFilename = ocrState.csvHeaders.findIndex(h => ['filename', 'file', 'image', 'path'].includes(h.toLowerCase()));
+            if (colFilename === -1) colFilename = 0;
+
+            let colLabel = ocrState.csvHeaders.findIndex(h => ['label', 'text', 'annotation', 'ocr'].includes(h.toLowerCase()));
+            if (colLabel === -1) {
+                colLabel = ocrState.csvHeaders.findIndex((h, idx) => idx !== colFilename && h.toLowerCase() !== 'finalized');
+                if (colLabel === -1) {
+                    colLabel = 1;
+                    if (colLabel >= ocrState.csvHeaders.length) {
+                        ocrState.csvHeaders.push('label');
+                        colLabel = ocrState.csvHeaders.length - 1;
+                    }
+                }
+            }
+
+            let colFinalized = ocrState.csvHeaders.findIndex(h => h.toLowerCase() === 'finalized');
+            if (colFinalized === -1) {
+                ocrState.csvHeaders.push('finalized');
+                colFinalized = ocrState.csvHeaders.length - 1;
+            }
+
+            ocrState.colFilename = colFilename;
+            ocrState.colLabel = colLabel;
+            ocrState.colFinalized = colFinalized;
+
+            ocrState.csvData = {};
+            for (const row of dataRows) {
+                if (row.length === 0 || (row.length === 1 && row[0] === "")) continue;
+                
+                while (row.length < ocrState.csvHeaders.length) {
+                    row.push("");
+                }
+
+                const filepath = row[colFilename] || "";
+                const filename = filepath.split(/[/\\]/).pop().trim();
+                if (!filename) continue;
+
+                const label = row[colLabel] || "";
+                const finalized = row[colFinalized] || "";
+
+                ocrState.csvData[filename] = {
+                    originalFilepath: filepath,
+                    label: label,
+                    finalized: finalized,
+                    row: row
+                };
+            }
+        }
+
+        async function ocrHandleDirSelect(e) {
+            try {
+                const files = Array.from(e.target.files);
+                const imageExtensions = /\.(jpe?g|png|webp)$/i;
+                ocrState.allImageFiles = files.filter(f => imageExtensions.test(f.name));
+                
+                if (ocrState.allImageFiles.length > 0) {
+                    const firstRelative = ocrState.allImageFiles[0].webkitRelativePath;
+                    const folderName = firstRelative ? firstRelative.split('/')[0] : "Dossier";
+                    document.getElementById('ocr-dir-status').innerText = `${folderName} (${ocrState.allImageFiles.length} images)`;
+                } else {
+                    document.getElementById('ocr-dir-status').innerText = "Aucune image trouvée.";
+                    alert("Aucune image valide (.jpg, .png, .webp) trouvée dans le dossier sélectionné.");
+                }
+
+                ocrFilterImages();
+            } catch (err) {
+                console.error(err);
+                alert("Erreur lors de la lecture du dossier.");
+            }
+        }
+
+        async function ocrHandleCsvSelect(e) {
+            try {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                document.getElementById('ocr-csv-status').innerText = file.name;
+                const text = await file.text();
+                ocrParseCsvContent(text);
+                
+                ocrFilterImages();
+            } catch (err) {
+                console.error(err);
+                alert("Erreur lors de la lecture du fichier CSV.");
+            }
+        }
+
+        function ocrFilterImages() {
+            if (ocrState.allImageFiles.length === 0) return;
+
+            ocrState.imageFiles = ocrState.allImageFiles.filter(file => {
+                const filename = file.name;
+                const data = ocrState.csvData[filename];
+                if (data && data.finalized && data.finalized.trim().toLowerCase() === 'yes') {
+                    return false;
+                }
+                return true;
+            });
+
+            if (ocrState.imageFiles.length > 0) {
+                ocrState.currentIndex = 0;
+                ocrUpdateProgress();
+                ocrLoadImage(ocrState.imageFiles[ocrState.currentIndex]);
+            } else {
+                ocrState.currentIndex = -1;
+                ocrCtx.clearRect(0, 0, ocrCanvas.width, ocrCanvas.height);
+                document.getElementById('ocr-progress-text').innerText = `0 / 0`;
+                document.getElementById('ocr-filename-display').innerText = "";
+                document.getElementById('ocr-text').value = "";
+                alert("Toutes les images du dossier sont déjà finalisées ou aucune image n'est disponible.");
+            }
+        }
+
+        async function ocrLoadImage(file) {
+            if (!file) return;
+            const url = URL.createObjectURL(file);
+
+            const img = new Image();
+            img.onload = () => {
+                ocrState.currentImageElement = img;
+                ocrState.zoom = 1;
+                ocrFitCanvas();
+                ocrRender();
+                
+                const filename = file.name;
+                document.getElementById('ocr-filename-display').innerText = filename;
+                
+                const dataVal = ocrState.csvData[filename];
+                document.getElementById('ocr-text').value = (dataVal ? dataVal.label : "") || "";
+                document.getElementById('ocr-text').focus();
+            };
+            img.src = url;
+        }
+
+        function ocrFitCanvas() {
+            if (!ocrState.currentImageElement) return;
+
+            ocrCanvas.style.display = 'none';
+            const cw = ocrContainer.clientWidth - 40;
+            const ch = ocrContainer.clientHeight - 40;
+            ocrCanvas.style.display = 'inline-block';
+
+            const iw = ocrState.currentImageElement.width;
+            const ih = ocrState.currentImageElement.height;
+
+            const baseScale = Math.min(cw / iw, ch / ih);
+            ocrState.scale = baseScale * ocrState.zoom;
+
+            ocrCanvas.width = iw * ocrState.scale;
+            ocrCanvas.height = ih * ocrState.scale;
+        }
+
+        function ocrRender() {
+            if (!ocrState.currentImageElement) return;
+            ocrCtx.clearRect(0, 0, ocrCanvas.width, ocrCanvas.height);
+            ocrCtx.save();
+            ocrCtx.scale(ocrState.scale, ocrState.scale);
+            ocrCtx.drawImage(ocrState.currentImageElement, 0, 0);
+            ocrCtx.restore();
+        }
+
+        window.addEventListener('resize', () => {
+            if (document.getElementById('tab-content-ocr').classList.contains('active')) {
+                ocrFitCanvas();
+                ocrRender();
+            }
+        });
+
+        ocrContainer.addEventListener('wheel', e => {
+            if (!ocrState.currentImageElement) return;
+            e.preventDefault();
+
+            const oldRect = ocrCanvas.getBoundingClientRect();
+            const mouseX = e.clientX - oldRect.left;
+            const mouseY = e.clientY - oldRect.top;
+
+            const oldZoom = ocrState.zoom;
+            const zoomFactor = Math.exp(-e.deltaY * 0.0015);
+            ocrState.zoom *= zoomFactor;
+            ocrState.zoom = Math.max(0.1, Math.min(ocrState.zoom, 20));
+
+            const zoomRatio = ocrState.zoom / oldZoom;
+
+            ocrFitCanvas();
+            ocrRender();
+
+            const newRect = ocrCanvas.getBoundingClientRect();
+            const errorX = (newRect.left + mouseX * zoomRatio) - e.clientX;
+            const errorY = (newRect.top + mouseY * zoomRatio) - e.clientY;
+
+            ocrContainer.scrollLeft += errorX;
+            ocrContainer.scrollTop += errorY;
+        }, { passive: false });
+
+        function ocrEscapeCsv(val) {
+            if (val === null || val === undefined) return "";
+            const str = String(val);
+            if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+                return '"' + str.replace(/"/g, '""') + '"';
+            }
+            return str;
+        }
+
+        function validateOcrText(text, type) {
+            if (!text) return true;
+
+            if (type === 'NOM') {
+                let cleaned = text.replace(/Ep\./g, "").replace(/épouse/g, "");
+                if (!/^[A-Z \-']*$/.test(cleaned)) return false;
+                return true;
+            } else if (type === 'PRENOM') {
+                return /^[A-Z \-'\.]+$/.test(text);
+            } else if (type === 'DATE_EXPIRATION') {
+                return /^(\d{2}\/\d{2}\/\d{4}|\d{2} \d{2} \d{4})$/.test(text);
+            } else if (type === 'NUMERO_CARTE') {
+                return /^[0-9A-Z]+$/.test(text);
+            }
+            return true;
+        }
+
+        async function ocrValidateAndSave() {
+            if (ocrState.currentIndex === -1 || ocrState.imageFiles.length === 0) {
+                return false;
+            }
+
+            const file = ocrState.imageFiles[ocrState.currentIndex];
+            const filename = file.name;
+            const textValue = document.getElementById('ocr-text').value.trim();
+            const fieldType = document.getElementById('ocr-field-type').value;
+
+            if (textValue !== "") {
+                if (!validateOcrText(textValue, fieldType)) {
+                    alert("Format non valide. Veuillez corriger.");
+                    return false;
+                }
+            }
+
+            let data = ocrState.csvData[filename];
+            if (!data) {
+                const newRow = [];
+                while (newRow.length < ocrState.csvHeaders.length) {
+                    newRow.push("");
+                }
+                newRow[ocrState.colFilename] = file.webkitRelativePath || filename;
+                newRow[ocrState.colLabel] = textValue;
+                newRow[ocrState.colFinalized] = "Yes";
+
+                ocrState.csvData[filename] = {
+                    originalFilepath: file.webkitRelativePath || filename,
+                    label: textValue,
+                    finalized: "Yes",
+                    row: newRow
+                };
+            } else {
+                data.label = textValue;
+                data.finalized = "Yes";
+                data.row[ocrState.colLabel] = textValue;
+                data.row[ocrState.colFinalized] = "Yes";
+            }
+
+            ocrState.hasUnsavedChanges = true;
+
+            return true;
+        }
+
+        async function ocrNextImage() {
+            if (ocrState.currentIndex < ocrState.imageFiles.length - 1) {
+                const ok = await ocrValidateAndSave();
+                if (!ok) return;
+                ocrState.currentIndex++;
+                ocrUpdateProgress();
+                await ocrLoadImage(ocrState.imageFiles[ocrState.currentIndex]);
+            } else {
+                const ok = await ocrValidateAndSave();
+                if (ok) alert("Finished all images!");
+            }
+        }
+
+        async function ocrSkipImage() {
+            if (ocrState.currentIndex < ocrState.imageFiles.length - 1) {
+                ocrState.currentIndex++;
+                ocrUpdateProgress();
+                await ocrLoadImage(ocrState.imageFiles[ocrState.currentIndex]);
+            } else {
+                alert("Finished all images! (Skipped last)");
+            }
+        }
+
+        async function ocrPrevImage() {
+            if (ocrState.currentIndex > 0) {
+                const ok = await ocrValidateAndSave();
+                if (!ok) return;
+                ocrState.currentIndex--;
+                ocrUpdateProgress();
+                await ocrLoadImage(ocrState.imageFiles[ocrState.currentIndex]);
+            }
+        }
+
+        function ocrUpdateProgress() {
+            document.getElementById('ocr-progress-text').innerText = `${ocrState.currentIndex + 1} / ${ocrState.imageFiles.length}`;
+        }
+
+        function ocrDownloadCsv() {
+            const entries = Object.entries(ocrState.csvData);
+            let csvContent = "\uFEFF";
+            csvContent += ocrState.csvHeaders.map(ocrEscapeCsv).join(',') + '\n';
+            
+            let rowCount = 0;
+            for (const [filename, data] of entries) {
+                if (data.label && data.label.trim() !== "") {
+                    const row = [...data.row];
+                    row[ocrState.colFilename] = data.originalFilepath || filename;
+                    row[ocrState.colLabel] = data.label;
+                    row[ocrState.colFinalized] = data.finalized || "";
+                    
+                    csvContent += row.map(ocrEscapeCsv).join(',') + '\n';
+                    rowCount++;
+                }
+            }
+            
+            if (rowCount === 0) {
+                alert("Aucun label à télécharger. Les images sans label ne sont pas incluses.");
+                return;
+            }
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "labels.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            ocrState.hasUnsavedChanges = false;
+        }
+
+        window.addEventListener('beforeunload', e => {
+            if (typeof ocrState !== 'undefined' && ocrState.hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        document.getElementById('ocr-btn-select-dir').onclick = () => document.getElementById('ocr-dir-input').click();
+        document.getElementById('ocr-btn-select-csv').onclick = () => document.getElementById('ocr-csv-input').click();
+        document.getElementById('ocr-btn-download-csv').onclick = ocrDownloadCsv;
+        document.getElementById('ocr-btn-next').onclick = ocrNextImage;
+        document.getElementById('ocr-btn-skip').onclick = ocrSkipImage;
+        document.getElementById('ocr-btn-prev').onclick = ocrPrevImage;
+        
+        document.getElementById('ocr-dir-input').onchange = ocrHandleDirSelect;
+        document.getElementById('ocr-csv-input').onchange = ocrHandleCsvSelect;
+
+        document.getElementById('ocr-text').addEventListener('keydown', e => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                ocrSkipImage();
+            } else if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                ocrNextImage();
+            }
+        });
+
+        // --- Custom Context Menu Logic ---
+        const ocrContextMenu = document.getElementById('ocr-context-menu');
+        const ocrTextArea = document.getElementById('ocr-text');
+
+        ocrTextArea.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            ocrContextMenu.style.display = 'block';
+            ocrContextMenu.style.left = e.pageX + 'px';
+            ocrContextMenu.style.top = e.pageY + 'px';
+        });
+
+        document.addEventListener('click', e => {
+            if (e.target !== ocrContextMenu) {
+                ocrContextMenu.style.display = 'none';
+            }
+        });
+
+        async function ocrContextMenuAction(action) {
+            const textarea = ocrTextArea;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const val = textarea.value;
+            const selectedText = val.substring(start, end);
+
+            ocrContextMenu.style.display = 'none';
+            textarea.focus();
+
+            if (action === 'uppercase' && start !== end) {
+                textarea.value = val.substring(0, start) + selectedText.toUpperCase() + val.substring(end);
+                textarea.selectionStart = start;
+                textarea.selectionEnd = end;
+            } else if (action === 'copy' && start !== end) {
+                try { await navigator.clipboard.writeText(selectedText); } catch (err) {}
+            } else if (action === 'cut' && start !== end) {
+                try { await navigator.clipboard.writeText(selectedText); } catch (err) {}
+                textarea.value = val.substring(0, start) + val.substring(end);
+                textarea.selectionStart = textarea.selectionEnd = start;
+            } else if (action === 'paste') {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    textarea.value = val.substring(0, start) + text + val.substring(end);
+                    textarea.selectionStart = textarea.selectionEnd = start + text.length;
+                } catch (err) {
+                    alert("Coller a été bloqué par le navigateur. Veuillez utiliser Ctrl+V.");
+                }
+            } else if (action === 'delete' && start !== end) {
+                textarea.value = val.substring(0, start) + val.substring(end);
+                textarea.selectionStart = textarea.selectionEnd = start;
+            }
+        }
+
+    </script>
+</body>
+
+</html>
