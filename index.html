@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OBB Annotator - YOLO OBB Export</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script type="text/javascript"
         src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=oNPMpAz1grYNikr4XroL2TKq85rsAqe_MlPwnd6qvwNXbV7yjPn9F_JlL05oBI0PYwh1cByNFVKkdvvdCeUaZLKAabchXxYB54yFsQvxgz32x8ulCulIFhiArpiW2lOIO-F6uVqkGD23efvBdQ7xHFg5hjxNXohoYo9mIyNorE7YmBABPjiinhXT61c0hjuybISB7Wi4Yd1Esb-J882wu6NhWWM5ZnGbqC_R9US_pe7VMNRS2tIDIjXMBP7KQJMrY_P6xcN0UKsycp7QTaM4zKpCuTbXzegukofwOp-GPuk-e0F3ycgPGUR9_qT6-h3SJH4U5B-ddSo8lL6ahTACML_l4PSjXJMsUv5wLPzlTbG07TDnC8Y9lAoaSbQq-gimmJfKr3Cc9UyjrLopSUZddUDDkweu3JGi_-UZEKlIbSDIats7VWIOKeeeQDTUSUHkSCs3sL9evJPPKdXQXLYZxVE_ij8Gzq5sjSorR6qMs_GmwBYck32ZbchxMgxPD9WlC4mfCUEQ7xNKgwtXQxDx0Qw-D4YmzLj9tWdT0bAIXalOredGwW4nofbpVnCNFaarwJp4CWb9CvxUPsR49orS3kiVGog8i2iDr1NYirrjD2rIJLE2ozmGRhDZsykezCCArxtacx-gMoh6_WSjsXeE87bRRTysDHftNRfBesG3AXZWjmGpJ6KPpzErTRfbGvurpQtleojqvnj2WnaS68jjAliX89m1_v3IGI5MRYx2Cuf1xYa9D6FyQp_5ukconkAk6xcXJ85LP1IeejrJiECIOCU_CL5MeRtxjRASqUtoI99SO4KFwRbE8bomep81rciWhWwovShpfRa84DVdn_ijMY6lv0s11pPmBhiUJQW92hbWRIdgICxBDWdnr1xGgLcPBdsYfOEf05XGROY4ws-2dyp9Jv1IJGjkCywlA5VpVyhEIsADtTYt7G2xYYKoXSb96X68MskARgAxeSRince4D3AaCBZDB-fo6Jqg7fEBmtU-XDmfXG5jdrnLddHGcWy6IMa93cPAx1wG5FYF8AfKL6LnQDaC9Vtw8_Cj3QuACrCP186VeBomcUmEitr6vKkucQhwSMkWzSt10qPbIxH3YG7Kh7ivBggQy0aJA0NhR8TxLtQXh3vQcl2QvwYQyMUep3tdfX37wQNmjWV4gjn2BGISAJJk8pHr4Y1kSC476b7GAogpxhdEeD2jnsOwfrcbWVoNFtzfxS9rKySBMTgRk4TwMTHquePY63TrC3CwDDXVBYEwjfKX5RUHtRjRLh_A_CH2dOSRqtdAH_Zysfzq6NohnUVVjpV_TDVBDd9JKrE3kLQekBLoIHL8j3KBGNpBKxQiim-sp0eyOJbxGThgyB414jO6SVGMjuyTKd9N_cKGmVO0Yj0PXr9r2-ksYm_f93zS3ceidxUssho__cyCEiaevgZ22KMHoSyjq9jXt9VeR6BjsY2p9IdXKid68B3_2k56zB1XbZKrd4ao2lFvq3tQ2cv_e5u6sSJfynTaEAFdCkArqjT0koOJftt8cJH73lb0CN_8Ll19kaXlSD6XMpwh5rF7ATXfweYMfKEntuXLi1u6xeFSVjR6HCenouOoJPeaKmbqOo_Z7hAGTqKYP1_3NpK4QD9daqiGLnT2WEPZwQzdUFUFWpz36oRKuDD2"
         nonce="272703ab28c978a8949fa3fa4fa17433" charset="UTF-8"></script>
@@ -323,24 +324,13 @@
                 <button id="btn-input">1. Select Image Input Folder</button>
                 <div id="input-status" class="status-text">No folder selected.</div>
 
-                <button id="btn-output">2. Select Output Folder</button>
-                <div id="output-status" class="status-text">No folder selected.</div>
-
-                <button id="btn-input-labels">3. Select Label Input Folder</button>
+                <button id="btn-input-labels">2. Select Labels Folder (Optional)</button>
                 <div id="input-labels-status" class="status-text">No folder selected.</div>
-            </div>
 
-            <div class="section">
-                <h2>Export Settings</h2>
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                    <input type="checkbox" id="chk-resize" checked />
-                    <label for="chk-resize" style="font-size: 0.9rem;">Resize Output Image</label>
-                </div>
-                <div style="display: flex; gap: 5px; align-items: center;" id="resize-inputs">
-                    <input type="number" id="resize-width" value="640" style="width: 60px; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: white; text-align: center;" />
-                    <span style="font-size: 0.9rem;">x</span>
-                    <input type="number" id="resize-height" value="640" style="width: 60px; padding: 5px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-color); color: white; text-align: center;" />
-                </div>
+                <button id="btn-finalized-labels">3. Select Finalized Labels Folder (Optional)</button>
+                <div id="finalized-labels-status" class="status-text">No folder selected.</div>
+
+                <button id="btn-download-labels" class="success" style="margin-top: 15px;">Download Labels (.zip)</button>
             </div>
 
             <div class="section">
@@ -452,6 +442,7 @@
     </div>
 
     <!-- Custom Context Menu -->
+    <div id="obb-context-menu" class="custom-context-menu"></div>
     <div id="ocr-context-menu" class="custom-context-menu">
         <div class="menu-item" onclick="ocrContextMenuAction('uppercase')">Mettre en majuscule</div>
         <div class="menu-item" onclick="ocrContextMenuAction('copy')">Copier</div>
@@ -466,8 +457,8 @@
          */
         const state = {
             inputDirHandle: null,
-            outputDirHandle: null,
             inputLabelsDirHandle: null,
+            finalizedLabelsDirHandle: null,
             imageFiles: [], // Array of FileSystemFileHandle
             currentIndex: -1,
             currentImageElement: null,
@@ -478,6 +469,8 @@
             activeClassId: 0,
 
             annotations: {}, // filename -> array of OBBs
+            imageDimensions: {}, // filename -> {w, h}
+            validatedImages: new Set(),
 
             // Canvas & Interaction
             scale: 1,
@@ -501,22 +494,21 @@
         /**
          * File System Logic
          */
-        async function filterObbImages() {
-            if (!state.inputDirHandle || !state.outputDirHandle || state.imageFiles.length === 0) return;
+        async function filterFinalizedImages() {
+            if (!state.finalizedLabelsDirHandle || state.imageFiles.length === 0) return;
 
             try {
-                const labelsDir = await state.outputDirHandle.getDirectoryHandle('labels');
-                const annotatedNames = new Set();
-                for await (const entry of labelsDir.values()) {
+                const finalizedNames = new Set();
+                for await (const entry of state.finalizedLabelsDirHandle.values()) {
                     if (entry.kind === 'file' && entry.name.endsWith('.txt')) {
-                        annotatedNames.add(entry.name);
+                        finalizedNames.add(entry.name);
                     }
                 }
 
                 const originalLength = state.imageFiles.length;
                 state.imageFiles = state.imageFiles.filter(file => {
                     const txtName = file.name.replace(/\.[^/.]+$/, ".txt");
-                    return !annotatedNames.has(txtName);
+                    return !finalizedNames.has(txtName);
                 });
 
                 if (state.imageFiles.length !== originalLength) {
@@ -530,11 +522,29 @@
                         document.getElementById('progress-text').innerText = `0 / 0`;
                         document.getElementById('filename-display').innerText = "";
                         document.getElementById('annot-count').innerText = "0 annotations";
-                        alert("Toutes les images OBB sont déjà labélisées.");
+                        alert("Toutes les images ont déjà été finalisées.");
                     }
+                } else {
+                    state.currentIndex = 0;
+                    updateProgress();
+                    await loadImage(state.imageFiles[state.currentIndex]);
                 }
             } catch (e) {
-                console.error("Error filtering OBB images:", e);
+                console.error("Error filtering finalized images:", e);
+            }
+        }
+
+        async function selectFinalizedLabelsDir() {
+            try {
+                const handle = await window.showDirectoryPicker();
+                state.finalizedLabelsDirHandle = handle;
+                document.getElementById('finalized-labels-status').innerText = handle.name;
+
+                if (state.imageFiles.length > 0) {
+                    await filterFinalizedImages();
+                }
+            } catch (e) {
+                console.error(e);
             }
         }
 
@@ -552,10 +562,10 @@
                 }
 
                 if (state.imageFiles.length > 0) {
-                    state.currentIndex = 0;
-                    if (state.outputDirHandle) {
-                        await filterObbImages();
+                    if (state.finalizedLabelsDirHandle) {
+                        await filterFinalizedImages();
                     } else {
+                        state.currentIndex = 0;
                         updateProgress();
                         await loadImage(state.imageFiles[state.currentIndex]);
                     }
@@ -582,24 +592,6 @@
             }
         }
 
-        async function selectOutputDir() {
-            try {
-                const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
-                state.outputDirHandle = handle;
-                document.getElementById('output-status').innerText = handle.name;
-
-                // Ensure subdirectories exist
-                await handle.getDirectoryHandle('images', { create: true });
-                await handle.getDirectoryHandle('labels', { create: true });
-
-                if (state.inputDirHandle) {
-                    await filterObbImages();
-                }
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
         async function loadImage(fileHandle) {
             const file = await fileHandle.getFile();
             const url = URL.createObjectURL(file);
@@ -607,6 +599,7 @@
             const img = new Image();
             img.onload = () => {
                 state.currentImageElement = img;
+                state.imageDimensions[file.name] = { w: img.width, h: img.height };
 
                 // Ensure annotations array exists for this file
                 if (!state.annotations[file.name]) {
@@ -628,14 +621,7 @@
             let fileHandle = null;
             const txtName = filename.replace(/\.[^/.]+$/, ".txt");
 
-            if (state.outputDirHandle) {
-                try {
-                    const labelsDir = await state.outputDirHandle.getDirectoryHandle('labels');
-                    fileHandle = await labelsDir.getFileHandle(txtName);
-                } catch (e) { }
-            }
-
-            if (!fileHandle && state.inputLabelsDirHandle) {
+            if (state.inputLabelsDirHandle) {
                 try {
                     fileHandle = await state.inputLabelsDirHandle.getFileHandle(txtName);
                 } catch (e) { }
@@ -681,81 +667,15 @@
             }
         }
 
-        async function validateAndSave() {
-            if (!state.outputDirHandle || state.currentIndex === -1) {
-                alert("Please select output directory first.");
-                return;
-            }
-
-            const fileHandle = state.imageFiles[state.currentIndex];
-            const filename = fileHandle.name;
-            const boxes = state.annotations[filename] || [];
-            const imgWidth = state.currentImageElement.width;
-            const imgHeight = state.currentImageElement.height;
-
-            try {
-                const imagesDir = await state.outputDirHandle.getDirectoryHandle('images', { create: true });
-                const labelsDir = await state.outputDirHandle.getDirectoryHandle('labels', { create: true });
-
-                // 1. Copy or Resize Image
-                const file = await fileHandle.getFile();
-                const destImgHandle = await imagesDir.getFileHandle(filename, { create: true });
-                const imgWritable = await destImgHandle.createWritable();
-                
-                const doResize = document.getElementById('chk-resize').checked;
-                if (doResize) {
-                    const tgtW = parseInt(document.getElementById('resize-width').value) || 640;
-                    const tgtH = parseInt(document.getElementById('resize-height').value) || 640;
-                    
-                    const offCanvas = document.createElement('canvas');
-                    offCanvas.width = tgtW;
-                    offCanvas.height = tgtH;
-                    const offCtx = offCanvas.getContext('2d');
-                    offCtx.drawImage(state.currentImageElement, 0, 0, tgtW, tgtH);
-                    
-                    const blob = await new Promise(resolve => {
-                        const ext = filename.split('.').pop().toLowerCase();
-                        let mime = 'image/jpeg';
-                        if (ext === 'png') mime = 'image/png';
-                        else if (ext === 'webp') mime = 'image/webp';
-                        offCanvas.toBlob(resolve, mime, 0.95);
-                    });
-                    await imgWritable.write(blob);
-                } else {
-                    await imgWritable.write(file);
-                }
-                await imgWritable.close();
-
-                // 2. Save Label
-                let labelText = "";
-                for (let b of boxes) {
-                    const corners = getOBBCorners(b);
-                    // Normalize corners
-                    const norm = corners.map(pt => ({ x: pt.x / imgWidth, y: pt.y / imgHeight }));
-                    labelText += `${b.classId} ${norm[0].x.toFixed(6)} ${norm[0].y.toFixed(6)} ${norm[1].x.toFixed(6)} ${norm[1].y.toFixed(6)} ${norm[2].x.toFixed(6)} ${norm[2].y.toFixed(6)} ${norm[3].x.toFixed(6)} ${norm[3].y.toFixed(6)}\n`;
-                }
-
-                const txtName = filename.replace(/\.[^/.]+$/, ".txt");
-                const destTxtHandle = await labelsDir.getFileHandle(txtName, { create: true });
-                const txtWritable = await destTxtHandle.createWritable();
-                await txtWritable.write(labelText);
-                await txtWritable.close();
-
-            } catch (e) {
-                console.error("Save failed", e);
-                alert("Failed to save: " + e.message);
-                return;
-            }
-        }
-
         async function nextImage() {
+            if (state.currentIndex !== -1) {
+                state.validatedImages.add(state.imageFiles[state.currentIndex].name);
+            }
             if (state.currentIndex < state.imageFiles.length - 1) {
-                await validateAndSave(); // Auto save
                 state.currentIndex++;
                 updateProgress();
                 await loadImage(state.imageFiles[state.currentIndex]);
             } else {
-                await validateAndSave();
                 alert("Finished all images!");
             }
         }
@@ -778,6 +698,57 @@
             }
         }
 
+        async function downloadLabels() {
+            if (!window.JSZip) {
+                alert("JSZip library not loaded.");
+                return;
+            }
+            if (state.validatedImages.size === 0) {
+                alert("Aucune image n'a été validée.");
+                return;
+            }
+
+            const zip = new JSZip();
+            let count = 0;
+
+            for (const filename of state.validatedImages) {
+                const txtName = filename.replace(/\.[^/.]+$/, ".txt");
+                let labelText = "";
+
+                if (state.annotations[filename]) {
+                    const boxes = state.annotations[filename];
+                    if (boxes.length > 0) {
+                        const dim = state.imageDimensions[filename];
+                        if (dim) {
+                            for (let b of boxes) {
+                                const corners = getOBBCorners(b);
+                                const norm = corners.map(pt => ({ x: pt.x / dim.w, y: pt.y / dim.h }));
+                                labelText += `${b.classId} ${norm[0].x.toFixed(6)} ${norm[0].y.toFixed(6)} ${norm[1].x.toFixed(6)} ${norm[1].y.toFixed(6)} ${norm[2].x.toFixed(6)} ${norm[2].y.toFixed(6)} ${norm[3].x.toFixed(6)} ${norm[3].y.toFixed(6)}\n`;
+                            }
+                        }
+                    }
+                }
+
+                zip.file(txtName, labelText);
+                count++;
+            }
+
+            if (count === 0) {
+                alert("No labels to download.");
+                return;
+            }
+
+            const blob = await zip.generateAsync({ type: "blob" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "labels_valides.zip";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
         /**
          * UI Updates
          */
@@ -791,9 +762,30 @@
             state.classes.forEach(c => {
                 const div = document.createElement('div');
                 div.className = `class-item ${state.activeClassId === c.id ? 'active' : ''}`;
-                div.innerHTML = `<div class="class-color" style="background-color: ${c.color}"></div><span>${c.name}</span>`;
-                div.onclick = () => {
+                div.innerHTML = `
+                    <div class="class-color" style="background-color: ${c.color}"></div>
+                    <span style="flex: 1;">${c.name}</span>
+                    <button class="edit-class-btn" style="width: auto; padding: 2px 5px; margin: 0; background: transparent; border: 1px solid #888; font-size: 0.8em; color: #fff;">Edit</button>
+                `;
+                div.onclick = (e) => {
+                    if (e.target.classList.contains('edit-class-btn')) {
+                        const newName = prompt("Edit class name:", c.name);
+                        if (newName && newName.trim()) {
+                            c.name = newName.trim();
+                            updateUI();
+                        }
+                        return;
+                    }
                     state.activeClassId = c.id;
+                    
+                    if (state.selectedBoxIndex !== -1 && state.currentIndex !== -1) {
+                        const filename = state.imageFiles[state.currentIndex]?.name;
+                        if (filename && state.annotations[filename] && state.annotations[filename][state.selectedBoxIndex]) {
+                            state.annotations[filename][state.selectedBoxIndex].classId = c.id;
+                            render();
+                        }
+                    }
+
                     updateUI();
                 };
                 list.appendChild(div);
@@ -923,10 +915,12 @@
                 // Box
                 ctx.strokeStyle = color;
                 ctx.lineWidth = isSelected ? 3 / state.scale : 2 / state.scale;
-                ctx.fillStyle = color + '33';
+                ctx.fillStyle = color;
                 ctx.beginPath();
                 ctx.rect(-box.width / 2, -box.height / 2, box.width, box.height);
+                ctx.globalAlpha = 0.2;
                 ctx.fill();
+                ctx.globalAlpha = 1.0;
                 ctx.stroke();
 
                 // Label rendering removed as requested
@@ -1050,10 +1044,52 @@
             return null;
         }
 
-        canvas.addEventListener('contextmenu', e => e.preventDefault());
+        const obbContextMenu = document.getElementById('obb-context-menu');
+        
+        canvas.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            if (!state.currentImageElement) return;
+            const pos = getMousePos(e);
+            const hit = hitTest(pos.x, pos.y);
+            if (hit) {
+                state.selectedBoxIndex = hit.index;
+                render();
+                updateUI();
+                
+                obbContextMenu.innerHTML = '';
+                state.classes.forEach(c => {
+                    const item = document.createElement('div');
+                    item.className = 'menu-item';
+                    item.innerHTML = `<span style="display:inline-block; width:12px; height:12px; background:${c.color}; margin-right:8px; border-radius:50%;"></span>${c.name}`;
+                    item.onclick = () => {
+                        const filename = state.imageFiles[state.currentIndex].name;
+                        state.annotations[filename][hit.index].classId = c.id;
+                        render();
+                        updateUI();
+                        obbContextMenu.style.display = 'none';
+                    };
+                    obbContextMenu.appendChild(item);
+                });
+
+                obbContextMenu.style.display = 'block';
+                obbContextMenu.style.left = e.pageX + 'px';
+                obbContextMenu.style.top = e.pageY + 'px';
+            }
+        });
 
         canvas.addEventListener('mousedown', e => {
             if (!state.currentImageElement) return;
+
+            const pos = getMousePos(e);
+            const hit = hitTest(pos.x, pos.y);
+
+            if (e.button === 2 && hit) {
+                e.preventDefault();
+                state.selectedBoxIndex = hit.index;
+                render();
+                updateUI();
+                return;
+            }
 
             if (e.button === 1 || e.button === 2 || spacePressed) {
                 e.preventDefault();
@@ -1064,10 +1100,6 @@
                 state.scrollStartY = container.scrollTop;
                 return;
             }
-
-            const pos = getMousePos(e);
-
-            const hit = hitTest(pos.x, pos.y);
 
             if (hit) {
                 state.selectedBoxIndex = hit.index;
@@ -1233,8 +1265,9 @@
         });
 
         document.getElementById('btn-input').onclick = selectInputDir;
-        document.getElementById('btn-output').onclick = selectOutputDir;
         document.getElementById('btn-input-labels').onclick = selectInputLabelsDir;
+        document.getElementById('btn-finalized-labels').onclick = selectFinalizedLabelsDir;
+        document.getElementById('btn-download-labels').onclick = downloadLabels;
         document.getElementById('btn-next').onclick = nextImage;
         document.getElementById('btn-skip').onclick = skipImage;
         document.getElementById('btn-prev').onclick = prevImage;
@@ -1739,6 +1772,9 @@
         document.addEventListener('click', e => {
             if (e.target !== ocrContextMenu) {
                 ocrContextMenu.style.display = 'none';
+            }
+            if (typeof obbContextMenu !== 'undefined' && obbContextMenu && !obbContextMenu.contains(e.target)) {
+                obbContextMenu.style.display = 'none';
             }
         });
 
