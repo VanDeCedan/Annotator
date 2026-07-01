@@ -616,6 +616,11 @@
 
                 state.selectedBoxIndex = -1;
                 state.zoom = 1;
+
+                if (state.classes.length > 0) {
+                    state.activeClassId = state.classes[0].id;
+                }
+
                 fitCanvas();
                 render();
                 updateUI();
@@ -792,7 +797,7 @@
                     e.stopPropagation(); // prevent annotator hotkeys from interfering
                 };
                 
-                div.onclick = (e) => {
+                div.onmousedown = (e) => {
                     if (e.target === nameInput) return; // let user type
                     
                     state.activeClassId = c.id;
@@ -1216,6 +1221,8 @@
                 return;
             }
 
+            let needsUpdateUI = false;
+
             if (state.mode === 'drawing' && state.currentBox) {
                 const w = Math.abs(state.currentBox.w);
                 const h = Math.abs(state.currentBox.h);
@@ -1233,13 +1240,36 @@
                         classId: state.activeClassId
                     });
                     state.selectedBoxIndex = state.annotations[filename].length - 1;
+
+                    // Automatically switch to the next class in order!
+                    if (state.classes.length > 0) {
+                        const currentIdx = state.classes.findIndex(c => c.id === state.activeClassId);
+                        const nextIdx = (currentIdx + 1) % state.classes.length;
+                        state.activeClassId = state.classes[nextIdx].id;
+                        
+                        // Update UI radio checked state
+                        const radioButtons = document.getElementsByName('active-class');
+                        if (radioButtons && radioButtons[nextIdx]) {
+                            radioButtons[nextIdx].checked = true;
+                            document.querySelectorAll('.class-item').forEach(item => item.classList.remove('active'));
+                            const itemDiv = radioButtons[nextIdx].closest('.class-item');
+                            if (itemDiv) {
+                                itemDiv.classList.add('active');
+                            }
+                        }
+                    }
                 }
                 state.currentBox = null;
+                needsUpdateUI = true;
+            } else if (state.mode !== 'idle') {
+                needsUpdateUI = true;
             }
 
             state.mode = 'idle';
             render();
-            updateUI();
+            if (needsUpdateUI) {
+                updateUI();
+            }
         });
 
         let spacePressed = false;
