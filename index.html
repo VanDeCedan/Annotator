@@ -478,6 +478,7 @@
             annotations: {}, // filename -> array of OBBs
             imageDimensions: {}, // filename -> {w, h}
             validatedImages: new Set(),
+            nomClassCount: 0,
 
             // Canvas & Interaction
             scale: 1,
@@ -800,20 +801,57 @@
                 div.onmousedown = (e) => {
                     if (e.target === nameInput) return; // let user type
                     
-                    state.activeClassId = c.id;
-                    radioBtn.checked = true;
-                    
                     if (state.selectedBoxIndex !== -1 && state.currentIndex !== -1) {
                         const filename = state.imageFiles[state.currentIndex]?.name;
                         if (filename && state.annotations[filename] && state.annotations[filename][state.selectedBoxIndex]) {
                             state.annotations[filename][state.selectedBoxIndex].classId = c.id;
                             render();
-                        }
-                    }
+                            
+                            // Automatically switch active class to the next class in order!
+                            if (state.classes.length > 0) {
+                                let nextIdx;
+                                if (c.name.toUpperCase() === 'NOM') {
+                                    state.nomClassCount = (state.nomClassCount || 0) + 1;
+                                    if (state.nomClassCount < 2) {
+                                        nextIdx = state.classes.findIndex(cls => cls.id === c.id);
+                                    } else {
+                                        state.nomClassCount = 0;
+                                        const currentIdx = state.classes.findIndex(cls => cls.id === c.id);
+                                        nextIdx = (currentIdx + 1) % state.classes.length;
+                                    }
+                                } else {
+                                    state.nomClassCount = 0;
+                                    const currentIdx = state.classes.findIndex(cls => cls.id === c.id);
+                                    nextIdx = (currentIdx + 1) % state.classes.length;
+                                }
 
-                    // Update UI visually without full rebuild to avoid losing focus/state
-                    document.querySelectorAll('.class-item').forEach(item => item.classList.remove('active'));
-                    div.classList.add('active');
+                                const nextClass = state.classes[nextIdx];
+                                state.activeClassId = nextClass.id;
+
+                                // Update radio selection in DOM
+                                const radioButtons = document.getElementsByName('active-class');
+                                if (radioButtons && radioButtons[nextIdx]) {
+                                    radioButtons[nextIdx].checked = true;
+                                    document.querySelectorAll('.class-item').forEach(item => item.classList.remove('active'));
+                                    const itemDiv = radioButtons[nextIdx].closest('.class-item');
+                                    if (itemDiv) {
+                                        itemDiv.classList.add('active');
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        state.activeClassId = c.id;
+                        radioBtn.checked = true;
+                        
+                        if (c.name.toUpperCase() === 'NOM') {
+                            state.nomClassCount = 0;
+                        }
+
+                        // Update UI visually without full rebuild to avoid losing focus/state
+                        document.querySelectorAll('.class-item').forEach(item => item.classList.remove('active'));
+                        div.classList.add('active');
+                    }
                 };
 
                 list.appendChild(div);
@@ -954,7 +992,8 @@
                 // Draw class name label above box
                 if (cls) {
                     ctx.fillStyle = color;
-                    ctx.font = `bold ${11 / state.scale}px sans-serif`;
+                    const fontSize = Math.max(10, Math.min(box.height * 0.8, 36));
+                    ctx.font = `bold ${fontSize}px sans-serif`;
                     ctx.textBaseline = 'bottom';
                     ctx.fillText(cls.name, -box.width / 2, -box.height / 2 - (3 / state.scale));
                 }
@@ -1098,8 +1137,41 @@
                     item.onclick = () => {
                         const filename = state.imageFiles[state.currentIndex].name;
                         state.annotations[filename][hit.index].classId = c.id;
+                        
+                        // Automatically switch active class to the next class in order!
+                        if (state.classes.length > 0) {
+                            let nextIdx;
+                            if (c.name.toUpperCase() === 'NOM') {
+                                state.nomClassCount = (state.nomClassCount || 0) + 1;
+                                if (state.nomClassCount < 2) {
+                                    nextIdx = state.classes.findIndex(cls => cls.id === c.id);
+                                } else {
+                                    state.nomClassCount = 0;
+                                    const currentIdx = state.classes.findIndex(cls => cls.id === c.id);
+                                    nextIdx = (currentIdx + 1) % state.classes.length;
+                                }
+                            } else {
+                                state.nomClassCount = 0;
+                                const currentIdx = state.classes.findIndex(cls => cls.id === c.id);
+                                nextIdx = (currentIdx + 1) % state.classes.length;
+                            }
+
+                            const nextClass = state.classes[nextIdx];
+                            state.activeClassId = nextClass.id;
+
+                            // Update radio selection in DOM
+                            const radioButtons = document.getElementsByName('active-class');
+                            if (radioButtons && radioButtons[nextIdx]) {
+                                radioButtons[nextIdx].checked = true;
+                                document.querySelectorAll('.class-item').forEach(item => item.classList.remove('active'));
+                                const itemDiv = radioButtons[nextIdx].closest('.class-item');
+                                if (itemDiv) {
+                                    itemDiv.classList.add('active');
+                                }
+                            }
+                        }
+                        
                         render();
-                        updateUI();
                         obbContextMenu.style.display = 'none';
                     };
                     obbContextMenu.appendChild(item);
@@ -1249,8 +1321,27 @@
 
                     // Automatically switch to the next class in order!
                     if (state.classes.length > 0) {
-                        const currentIdx = state.classes.findIndex(c => c.id === state.activeClassId);
-                        const nextIdx = (currentIdx + 1) % state.classes.length;
+                        const currentClass = state.classes.find(c => c.id === state.activeClassId);
+                        let nextIdx;
+
+                        if (currentClass && currentClass.name.toUpperCase() === 'NOM') {
+                            state.nomClassCount = (state.nomClassCount || 0) + 1;
+                            if (state.nomClassCount < 2) {
+                                // Keep it as NOM
+                                nextIdx = state.classes.findIndex(c => c.id === state.activeClassId);
+                            } else {
+                                // Reset count and move to next class
+                                state.nomClassCount = 0;
+                                const currentIdx = state.classes.findIndex(c => c.id === state.activeClassId);
+                                nextIdx = (currentIdx + 1) % state.classes.length;
+                            }
+                        } else {
+                            // Reset NOM count since we are on another class
+                            state.nomClassCount = 0;
+                            const currentIdx = state.classes.findIndex(c => c.id === state.activeClassId);
+                            nextIdx = (currentIdx + 1) % state.classes.length;
+                        }
+
                         state.activeClassId = state.classes[nextIdx].id;
                         
                         // Update UI radio checked state
