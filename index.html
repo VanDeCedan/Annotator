@@ -951,7 +951,13 @@
                 ctx.globalAlpha = 1.0;
                 ctx.stroke();
 
-                // Label rendering removed as requested
+                // Draw class name label above box
+                if (cls) {
+                    ctx.fillStyle = color;
+                    ctx.font = `bold ${11 / state.scale}px sans-serif`;
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText(cls.name, -box.width / 2, -box.height / 2 - (3 / state.scale));
+                }
 
                 // Handles if selected
                 if (isSelected) {
