@@ -464,7 +464,14 @@
             currentImageElement: null,
 
             classes: [
-                { id: 0, name: 'text', color: '#ff3333' }
+                { id: 0, name: 'STRUCTURE', color: '#ff3333' },
+                { id: 1, name: 'NOM', color: '#33ff33' },
+                { id: 2, name: 'TITRE', color: '#3333ff' },
+                { id: 3, name: 'INDICE', color: '#ffff33' },
+                { id: 4, name: 'PROVENANCEE', color: '#ff33ff' },
+                { id: 5, name: 'DATE DEPART', color: '#33ffff' },
+                { id: 6, name: 'DATE RETOUR', color: '#ff9933' },
+                { id: 7, name: 'SIGNATAIRE', color: '#9933ff' }
             ],
             activeClassId: 0,
 
@@ -738,6 +745,11 @@
                 return;
             }
 
+            // Always add classes.txt
+            const sortedClasses = [...state.classes].sort((a, b) => a.id - b.id);
+            const classesTxt = sortedClasses.map(c => c.name).join('\n');
+            zip.file("classes.txt", classesTxt);
+
             const blob = await zip.generateAsync({ type: "blob" });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
@@ -764,19 +776,27 @@
                 div.className = `class-item ${state.activeClassId === c.id ? 'active' : ''}`;
                 div.innerHTML = `
                     <div class="class-color" style="background-color: ${c.color}"></div>
-                    <span style="flex: 1;">${c.name}</span>
-                    <button class="edit-class-btn" style="width: auto; padding: 2px 5px; margin: 0; background: transparent; border: 1px solid #888; font-size: 0.8em; color: #fff;">Edit</button>
+                    <input type="text" class="class-name-input" value="${c.name}" style="flex: 1; background: transparent; border: 1px dashed #666; color: #fff; padding: 2px 5px; margin-right: 10px;" />
+                    <input type="radio" name="active-class" ${state.activeClassId === c.id ? 'checked' : ''} style="cursor: pointer; transform: scale(1.2);">
                 `;
-                div.onclick = (e) => {
-                    if (e.target.classList.contains('edit-class-btn')) {
-                        const newName = prompt("Edit class name:", c.name);
-                        if (newName && newName.trim()) {
-                            c.name = newName.trim();
-                            updateUI();
-                        }
-                        return;
+                
+                const nameInput = div.querySelector('.class-name-input');
+                const radioBtn = div.querySelector('input[type="radio"]');
+
+                nameInput.oninput = (e) => {
+                    if (e.target.value.trim()) {
+                        c.name = e.target.value.trim();
                     }
+                };
+                nameInput.onkeydown = (e) => {
+                    e.stopPropagation(); // prevent annotator hotkeys from interfering
+                };
+                
+                div.onclick = (e) => {
+                    if (e.target === nameInput) return; // let user type
+                    
                     state.activeClassId = c.id;
+                    radioBtn.checked = true;
                     
                     if (state.selectedBoxIndex !== -1 && state.currentIndex !== -1) {
                         const filename = state.imageFiles[state.currentIndex]?.name;
@@ -786,8 +806,11 @@
                         }
                     }
 
-                    updateUI();
+                    // Update UI visually without full rebuild to avoid losing focus/state
+                    document.querySelectorAll('.class-item').forEach(item => item.classList.remove('active'));
+                    div.classList.add('active');
                 };
+
                 list.appendChild(div);
             });
 
