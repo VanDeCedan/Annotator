@@ -321,13 +321,22 @@
 
             <div class="section">
                 <h2>Folders</h2>
-                <button id="btn-input">1. Select Image Input Folder</button>
+                <div style="display: flex; gap: 8px; margin-bottom: 5px;">
+                    <button id="btn-input" style="flex: 1;">1. Select Image Input Folder</button>
+                    <button id="btn-clear-input" title="Clear images" style="width: 40px; padding: 0; background-color: #555; border: 1px solid #777;">🗑️</button>
+                </div>
                 <div id="input-status" class="status-text">No folder selected.</div>
 
-                <button id="btn-input-labels">2. Select Labels Folder (Optional)</button>
+                <div style="display: flex; gap: 8px; margin-bottom: 5px; margin-top: 15px;">
+                    <button id="btn-input-labels" style="flex: 1;">2. Select Labels Folder (Optional)</button>
+                    <button id="btn-clear-input-labels" title="Clear labels" style="width: 40px; padding: 0; background-color: #555; border: 1px solid #777;">🗑️</button>
+                </div>
                 <div id="input-labels-status" class="status-text">No folder selected.</div>
 
-                <button id="btn-finalized-labels">3. Select Finalized Labels Folder (Optional)</button>
+                <div style="display: flex; gap: 8px; margin-bottom: 5px; margin-top: 15px;">
+                    <button id="btn-finalized-labels" style="flex: 1;">3. Select Finalized Labels Folder (Optional)</button>
+                    <button id="btn-clear-finalized-labels" title="Clear finalized labels" style="width: 40px; padding: 0; background-color: #555; border: 1px solid #777;">🗑️</button>
+                </div>
                 <div id="finalized-labels-status" class="status-text">No folder selected.</div>
 
                 <button id="btn-download-labels" class="success" style="margin-top: 15px;">Download Labels (.zip)</button>
@@ -456,9 +465,9 @@
          * Application State
          */
         const state = {
-            inputDirHandle: null,
-            inputLabelsDirHandle: null,
-            finalizedLabelsDirHandle: null,
+            inputDirHandles: [],
+            inputLabelsDirHandles: [],
+            finalizedLabelsDirHandles: [],
             imageFiles: [], // Array of FileSystemFileHandle
             currentIndex: -1,
             currentImageElement: null,
@@ -479,6 +488,11 @@
             imageDimensions: {}, // filename -> {w, h}
             validatedImages: new Set(),
             nomClassCount: 0,
+            hasUnsavedChanges: false,
+            currentZipBlob: null,
+            totalImagesCount: 0,
+            preLabelsCount: 0,
+            finalizedLabelsCount: 0,
 
             // Canvas & Interaction
             scale: 1,
@@ -503,21 +517,33 @@
          * File System Logic
          */
         async function filterFinalizedImages() {
-            if (!state.finalizedLabelsDirHandle || state.imageFiles.length === 0) return;
+            if (state.finalizedLabelsDirHandles.length === 0 || state.imageFiles.length === 0) return;
 
             try {
                 const finalizedNames = new Set();
-                for await (const entry of state.finalizedLabelsDirHandle.values()) {
-                    if (entry.kind === 'file' && entry.name.endsWith('.txt')) {
-                        finalizedNames.add(entry.name);
+                let finalizedCount = 0;
+                for (const handle of state.finalizedLabelsDirHandles) {
+                    for await (const entry of handle.values()) {
+                        if (entry.kind === 'file' && entry.name.endsWith('.txt')) {
+                            finalizedNames.add(entry.name);
+                            finalizedCount++;
+                        }
                     }
                 }
+                state.finalizedLabelsCount = finalizedCount;
+                const names = state.finalizedLabelsDirHandles.map(h => h.name).join(', ');
+                document.getElementById('finalized-labels-status').innerText = `${names} (${finalizedCount} fichiers de labels finalisés chargés)`;
 
                 const originalLength = state.imageFiles.length;
                 state.imageFiles = state.imageFiles.filter(file => {
                     const txtName = file.name.replace(/\.[^/.]+$/, ".txt");
                     return !finalizedNames.has(txtName);
                 });
+
+                if (state.inputDirHandles.length > 0) {
+                    const folderNames = state.inputDirHandles.map(h => h.name).join(', ');
+                    document.getElementById('input-status').innerText = `${folderNames} (${state.imageFiles.length} images restantes à annoter / ${state.totalImagesCount} au total)`;
+                }
 
                 if (state.imageFiles.length !== originalLength) {
                     if (state.imageFiles.length > 0) {
@@ -545,8 +571,21 @@
         async function selectFinalizedLabelsDir() {
             try {
                 const handle = await window.showDirectoryPicker();
-                state.finalizedLabelsDirHandle = handle;
-                document.getElementById('finalized-labels-status').innerText = handle.name;
+                if (!state.finalizedLabelsDirHandles.some(h => h.name === handle.name)) {
+                    state.finalizedLabelsDirHandles.push(handle);
+                }
+                
+                let finalizedCount = 0;
+                for (const h of state.finalizedLabelsDirHandles) {
+                    for await (const entry of h.values()) {
+                        if (entry.kind === 'file' && entry.name.endsWith('.txt')) {
+                            finalizedCount++;
+                        }
+                    }
+                }
+                state.finalizedLabelsCount = finalizedCount;
+                const names = state.finalizedLabelsDirHandles.map(h => h.name).join(', ');
+                document.getElementById('finalized-labels-status').innerText = `${names} (${finalizedCount} fichiers de labels finalisés chargés)`;
 
                 if (state.imageFiles.length > 0) {
                     await filterFinalizedImages();
@@ -559,18 +598,25 @@
         async function selectInputDir() {
             try {
                 const handle = await window.showDirectoryPicker();
-                state.inputDirHandle = handle;
-                document.getElementById('input-status').innerText = handle.name;
-
-                state.imageFiles = [];
-                for await (const entry of handle.values()) {
-                    if (entry.kind === 'file' && entry.name.match(/\.(jpe?g|png|webp)$/i)) {
-                        state.imageFiles.push(entry);
-                    }
+                if (!state.inputDirHandles.some(h => h.name === handle.name)) {
+                    state.inputDirHandles.push(handle);
                 }
 
+                let totalImages = state.totalImagesCount;
+                for await (const entry of handle.values()) {
+                    if (entry.kind === 'file' && entry.name.match(/\.(jpe?g|png|webp)$/i)) {
+                        if (!state.imageFiles.some(f => f.name === entry.name)) {
+                            state.imageFiles.push(entry);
+                            totalImages++;
+                        }
+                    }
+                }
+                state.totalImagesCount = totalImages;
+                const folderNames = state.inputDirHandles.map(h => h.name).join(', ');
+                document.getElementById('input-status').innerText = `${folderNames} (${totalImages} images chargées)`;
+
                 if (state.imageFiles.length > 0) {
-                    if (state.finalizedLabelsDirHandle) {
+                    if (state.finalizedLabelsDirHandles.length > 0) {
                         await filterFinalizedImages();
                     } else {
                         state.currentIndex = 0;
@@ -588,8 +634,21 @@
         async function selectInputLabelsDir() {
             try {
                 const handle = await window.showDirectoryPicker();
-                state.inputLabelsDirHandle = handle;
-                document.getElementById('input-labels-status').innerText = handle.name;
+                if (!state.inputLabelsDirHandles.some(h => h.name === handle.name)) {
+                    state.inputLabelsDirHandles.push(handle);
+                }
+
+                let preCount = 0;
+                for (const h of state.inputLabelsDirHandles) {
+                    for await (const entry of h.values()) {
+                        if (entry.kind === 'file' && entry.name.endsWith('.txt')) {
+                            preCount++;
+                        }
+                    }
+                }
+                state.preLabelsCount = preCount;
+                const names = state.inputLabelsDirHandles.map(h => h.name).join(', ');
+                document.getElementById('input-labels-status').innerText = `${names} (${preCount} fichiers de labels pré-existants chargés)`;
 
                 if (state.currentIndex !== -1 && state.imageFiles.length > 0) {
                     const filename = state.imageFiles[state.currentIndex].name;
@@ -598,6 +657,74 @@
             } catch (e) {
                 console.error(e);
             }
+        }
+
+        async function reloadImagesFromHandles() {
+            state.imageFiles = [];
+            let totalImages = 0;
+            for (const handle of state.inputDirHandles) {
+                for await (const entry of handle.values()) {
+                    if (entry.kind === 'file' && entry.name.match(/\.(jpe?g|png|webp)$/i)) {
+                        if (!state.imageFiles.some(f => f.name === entry.name)) {
+                            state.imageFiles.push(entry);
+                            totalImages++;
+                        }
+                    }
+                }
+            }
+            state.totalImagesCount = totalImages;
+        }
+
+        async function clearInput() {
+            state.inputDirHandles = [];
+            state.imageFiles = [];
+            state.currentIndex = -1;
+            state.totalImagesCount = 0;
+            state.currentImageElement = null;
+            state.annotations = {};
+            state.validatedImages.clear();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('input-status').innerText = "No folder selected.";
+            document.getElementById('progress-text').innerText = "0 / 0";
+            document.getElementById('filename-display').innerText = "";
+            document.getElementById('annot-count').innerText = "0 annotations";
+            stateChanged();
+            updateUI();
+        }
+
+        function clearInputLabels() {
+            state.inputLabelsDirHandles = [];
+            state.preLabelsCount = 0;
+            document.getElementById('input-labels-status').innerText = "No folder selected.";
+            if (state.currentIndex !== -1 && state.imageFiles.length > 0) {
+                const filename = state.imageFiles[state.currentIndex].name;
+                state.annotations[filename] = [];
+                render();
+            }
+            stateChanged();
+        }
+
+        async function clearFinalizedLabels() {
+            state.finalizedLabelsDirHandles = [];
+            state.finalizedLabelsCount = 0;
+            document.getElementById('finalized-labels-status').innerText = "No folder selected.";
+
+            if (state.inputDirHandles.length > 0) {
+                await reloadImagesFromHandles();
+                if (state.imageFiles.length > 0) {
+                    state.currentIndex = 0;
+                    updateProgress();
+                    await loadImage(state.imageFiles[state.currentIndex]);
+                }
+            } else {
+                state.imageFiles = [];
+                state.currentIndex = -1;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                document.getElementById('progress-text').innerText = "0 / 0";
+                document.getElementById('filename-display').innerText = "";
+                document.getElementById('annot-count').innerText = "0 annotations";
+            }
+            stateChanged();
         }
 
         async function loadImage(fileHandle) {
@@ -634,9 +761,10 @@
             let fileHandle = null;
             const txtName = filename.replace(/\.[^/.]+$/, ".txt");
 
-            if (state.inputLabelsDirHandle) {
+            for (const handle of state.inputLabelsDirHandles) {
                 try {
-                    fileHandle = await state.inputLabelsDirHandle.getFileHandle(txtName);
+                    fileHandle = await handle.getFileHandle(txtName);
+                    break;
                 } catch (e) { }
             }
 
@@ -683,6 +811,7 @@
         async function nextImage() {
             if (state.currentIndex !== -1) {
                 state.validatedImages.add(state.imageFiles[state.currentIndex].name);
+                stateChanged();
             }
             if (state.currentIndex < state.imageFiles.length - 1) {
                 state.currentIndex++;
@@ -711,19 +840,13 @@
             }
         }
 
-        async function downloadLabels() {
-            if (!window.JSZip) {
-                alert("JSZip library not loaded.");
-                return;
-            }
-            if (state.validatedImages.size === 0) {
-                alert("Aucune image n'a été validée.");
+        async function updateZipBlob() {
+            if (!window.JSZip || (state.validatedImages.size === 0 && state.finalizedLabelsDirHandles.length === 0)) {
+                state.currentZipBlob = null;
                 return;
             }
 
             const zip = new JSZip();
-            let count = 0;
-
             for (const filename of state.validatedImages) {
                 const txtName = filename.replace(/\.[^/.]+$/, ".txt");
                 let labelText = "";
@@ -741,30 +864,72 @@
                         }
                     }
                 }
-
                 zip.file(txtName, labelText);
-                count++;
             }
 
-            if (count === 0) {
-                alert("No labels to download.");
-                return;
+            // Also include finalized labels
+            for (const handle of state.finalizedLabelsDirHandles) {
+                try {
+                    for await (const entry of handle.values()) {
+                        if (entry.kind === 'file' && entry.name.endsWith('.txt')) {
+                            // If it was already added by validated images, skip it so validated version takes precedence
+                            if (zip.file(entry.name)) {
+                                continue;
+                            }
+                            try {
+                                const file = await entry.getFile();
+                                const content = await file.text();
+                                zip.file(entry.name, content);
+                            } catch (err) {
+                                console.error("Error reading finalized file:", entry.name, err);
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error reading finalized labels handle:", err);
+                }
             }
 
-            // Always add classes.txt
             const sortedClasses = [...state.classes].sort((a, b) => a.id - b.id);
             const classesTxt = sortedClasses.map(c => c.name).join('\n');
             zip.file("classes.txt", classesTxt);
 
-            const blob = await zip.generateAsync({ type: "blob" });
+            try {
+                state.currentZipBlob = await zip.generateAsync({ type: "blob" });
+            } catch (e) {
+                console.error("Error generating zip:", e);
+            }
+        }
+
+        function triggerBlobDownload(blob, filename) {
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
-            link.download = "labels_valides.zip";
+            link.download = filename;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
+        }
+
+        function stateChanged() {
+            state.hasUnsavedChanges = true;
+            updateZipBlob();
+        }
+
+        async function downloadLabels() {
+            if (!window.JSZip) {
+                alert("JSZip library not loaded.");
+                return;
+            }
+            await updateZipBlob();
+            if (!state.currentZipBlob) {
+                alert("Aucune image n'a été validée.");
+                return;
+            }
+
+            triggerBlobDownload(state.currentZipBlob, "labels_valides.zip");
+            state.hasUnsavedChanges = false;
         }
 
         /**
@@ -792,6 +957,7 @@
                 nameInput.oninput = (e) => {
                     if (e.target.value.trim()) {
                         c.name = e.target.value.trim();
+                        stateChanged();
                     }
                 };
                 nameInput.onkeydown = (e) => {
@@ -806,6 +972,7 @@
                         if (filename && state.annotations[filename] && state.annotations[filename][state.selectedBoxIndex]) {
                             state.annotations[filename][state.selectedBoxIndex].classId = c.id;
                             render();
+                            stateChanged();
                             
                             // Automatically switch active class to the next class in order!
                             if (state.classes.length > 0) {
@@ -1137,6 +1304,7 @@
                     item.onclick = () => {
                         const filename = state.imageFiles[state.currentIndex].name;
                         state.annotations[filename][hit.index].classId = c.id;
+                        stateChanged();
                         
                         // Automatically switch active class to the next class in order!
                         if (state.classes.length > 0) {
@@ -1318,6 +1486,7 @@
                         classId: state.activeClassId
                     });
                     state.selectedBoxIndex = state.annotations[filename].length - 1;
+                    stateChanged();
 
                     // Automatically switch to the next class in order!
                     if (state.classes.length > 0) {
@@ -1360,6 +1529,7 @@
                 needsUpdateUI = true;
             } else if (state.mode !== 'idle') {
                 needsUpdateUI = true;
+                stateChanged();
             }
 
             state.mode = 'idle';
@@ -1393,6 +1563,7 @@
                     const filename = state.imageFiles[state.currentIndex].name;
                     state.annotations[filename].splice(state.selectedBoxIndex, 1);
                     state.selectedBoxIndex = -1;
+                    stateChanged();
                     render();
                     updateUI();
                 }
@@ -1417,6 +1588,9 @@
         document.getElementById('btn-input').onclick = selectInputDir;
         document.getElementById('btn-input-labels').onclick = selectInputLabelsDir;
         document.getElementById('btn-finalized-labels').onclick = selectFinalizedLabelsDir;
+        document.getElementById('btn-clear-input').onclick = clearInput;
+        document.getElementById('btn-clear-input-labels').onclick = clearInputLabels;
+        document.getElementById('btn-clear-finalized-labels').onclick = clearFinalizedLabels;
         document.getElementById('btn-download-labels').onclick = downloadLabels;
         document.getElementById('btn-next').onclick = nextImage;
         document.getElementById('btn-skip').onclick = skipImage;
@@ -1882,7 +2056,14 @@
         }
 
         window.addEventListener('beforeunload', e => {
-            if (typeof ocrState !== 'undefined' && ocrState.hasUnsavedChanges) {
+            let hasUnsavedObb = (typeof state !== 'undefined' && state.hasUnsavedChanges);
+            let hasUnsavedOcr = (typeof ocrState !== 'undefined' && ocrState.hasUnsavedChanges);
+
+            if (hasUnsavedObb || hasUnsavedOcr) {
+                if (hasUnsavedObb && state.currentZipBlob) {
+                    triggerBlobDownload(state.currentZipBlob, "labels_valides.zip");
+                    state.hasUnsavedChanges = false;
+                }
                 e.preventDefault();
                 e.returnValue = '';
             }
