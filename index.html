@@ -340,6 +340,7 @@
                 <div id="finalized-labels-status" class="status-text">No folder selected.</div>
 
                 <button id="btn-download-labels" class="success" style="margin-top: 15px;">Download Labels (.zip)</button>
+                <div id="validated-count" style="margin-top: 10px; font-weight: bold; color: #33ff33;">0 images validées</div>
             </div>
 
             <div class="section">
@@ -366,6 +367,7 @@
                     <span id="progress-text">0 / 0</span>
                     <button id="btn-skip" style="background-color: #888;">Skip (S) ➡</button>
                     <button id="btn-next" class="success">Validate & Next (N / Tab) ➡</button>
+                    <span id="navbar-validated-count" style="margin-left: 15px; font-weight: bold; color: #33ff33; background: rgba(51,255,51,0.1); padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(51,255,51,0.2); font-size: 0.9rem;">0 validées</span>
                 </div>
                 <div class="toolbar-group">
                     <div class="status-text" style="margin:0; font-size:1rem;" id="filename-display"></div>
@@ -392,15 +394,30 @@
 
             <div class="section">
                 <h2>Dossiers & Fichiers</h2>
+                
                 <input type="file" id="ocr-dir-input" webkitdirectory directory multiple style="display: none;">
-                <button id="ocr-btn-select-dir">1. Sélectionner le dossier d'images</button>
+                <div style="display: flex; gap: 8px; margin-bottom: 5px;">
+                    <button id="ocr-btn-select-dir" style="flex: 1;">1. Sélectionner le dossier d'images</button>
+                    <button id="ocr-btn-clear-dir" title="Vider les images" style="width: 40px; padding: 0; background-color: #555; border: 1px solid #777;">🗑️</button>
+                </div>
                 <div id="ocr-dir-status" class="status-text">Aucun dossier sélectionné.</div>
 
                 <input type="file" id="ocr-csv-input" accept=".csv" style="display: none;">
-                <button id="ocr-btn-select-csv">2. Sélectionner labels.csv</button>
+                <div style="display: flex; gap: 8px; margin-bottom: 5px; margin-top: 15px;">
+                    <button id="ocr-btn-select-csv" style="flex: 1;">2. Sélectionner labels.csv (Optionnel)</button>
+                    <button id="ocr-btn-clear-csv" title="Vider le CSV" style="width: 40px; padding: 0; background-color: #555; border: 1px solid #777;">🗑️</button>
+                </div>
                 <div id="ocr-csv-status" class="status-text">Aucun fichier sélectionné.</div>
 
+                <input type="file" id="ocr-finalized-csv-input" accept=".csv" style="display: none;">
+                <div style="display: flex; gap: 8px; margin-bottom: 5px; margin-top: 15px;">
+                    <button id="ocr-btn-select-finalized-csv" style="flex: 1;">3. Sélectionner labels finalisés.csv (Optionnel)</button>
+                    <button id="ocr-btn-clear-finalized-csv" title="Vider le CSV finalisé" style="width: 40px; padding: 0; background-color: #555; border: 1px solid #777;">🗑️</button>
+                </div>
+                <div id="ocr-finalized-csv-status" class="status-text">Aucun fichier sélectionné.</div>
+
                 <button id="ocr-btn-download-csv" class="success" style="margin-top: 15px;">Télécharger labels.csv</button>
+                <div id="ocr-validated-count" style="margin-top: 10px; font-weight: bold; color: #33ff33;">0 images validées</div>
             </div>
 
             <div class="section">
@@ -434,6 +451,7 @@
                     <span id="ocr-progress-text">0 / 0</span>
                     <button id="ocr-btn-skip" style="background-color: #888;">Skip (Ctrl+Enter) ➡</button>
                     <button id="ocr-btn-next" class="success">Save & Next (Enter) ➡</button>
+                    <span id="ocr-navbar-validated-count" style="margin-left: 15px; font-weight: bold; color: #33ff33; background: rgba(51,255,51,0.1); padding: 4px 10px; border-radius: 4px; border: 1px solid rgba(51,255,51,0.2); font-size: 0.9rem;">0 validées</span>
                 </div>
                 <div class="toolbar-group">
                     <div class="status-text" style="margin:0; font-size:1rem;" id="ocr-filename-display"></div>
@@ -686,6 +704,8 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             document.getElementById('input-status').innerText = "No folder selected.";
             document.getElementById('progress-text').innerText = "0 / 0";
+            document.getElementById('validated-count').innerText = "0 images validées";
+            document.getElementById('navbar-validated-count').innerText = "0 validées";
             document.getElementById('filename-display').innerText = "";
             document.getElementById('annot-count').innerText = "0 annotations";
             stateChanged();
@@ -937,6 +957,8 @@
          */
         function updateProgress() {
             document.getElementById('progress-text').innerText = `${state.currentIndex + 1} / ${state.imageFiles.length}`;
+            document.getElementById('validated-count').innerText = `${state.validatedImages.size} images validées`;
+            document.getElementById('navbar-validated-count').innerText = `${state.validatedImages.size} validées`;
         }
 
         function updateUI() {
@@ -1635,6 +1657,11 @@
             currentImageElement: null,
             csvHeaders: ['filename', 'label', 'finalized'],
             csvData: {},
+            preCsvData: {},
+            finalizedCsvData: {},
+            loadedPreCsvNames: [],
+            loadedFinalizedCsvNames: [],
+            validatedImages: new Set(),
             colFilename: 0,
             colLabel: 1,
             colFinalized: 2,
@@ -1694,14 +1721,14 @@
             return lines;
         }
 
-        function ocrParseCsvContent(text) {
+        function ocrMergeCsvData() {
+            ocrState.csvData = Object.assign({}, ocrState.finalizedCsvData, ocrState.preCsvData);
+        }
+
+        function ocrParseCsvContent(text, isFinalized = false) {
             const cleanText = text.startsWith('\uFEFF') ? text.slice(1) : text;
             const rows = parseCSV(cleanText);
-            if (rows.length === 0) {
-                ocrState.csvHeaders = ['filename', 'label', 'finalized'];
-                ocrState.csvData = {};
-                return;
-            }
+            if (rows.length === 0) return;
 
             const firstRow = rows[0];
             const hasImageExt = /\.(jpe?g|png|webp|gif|bmp)$/i.test(firstRow[0]);
@@ -1716,7 +1743,9 @@
                 dataRows = rows.slice(1);
             }
 
-            ocrState.csvHeaders = headerRow.map(h => h.trim());
+            if (!ocrState.csvHeaders || ocrState.csvHeaders.length <= 3) {
+                ocrState.csvHeaders = headerRow.map(h => h.trim());
+            }
 
             let colFilename = ocrState.csvHeaders.findIndex(h => ['filename', 'file', 'image', 'path'].includes(h.toLowerCase()));
             if (colFilename === -1) colFilename = 0;
@@ -1743,7 +1772,8 @@
             ocrState.colLabel = colLabel;
             ocrState.colFinalized = colFinalized;
 
-            ocrState.csvData = {};
+            const targetData = isFinalized ? ocrState.finalizedCsvData : ocrState.preCsvData;
+
             for (const row of dataRows) {
                 if (row.length === 0 || (row.length === 1 && row[0] === "")) continue;
                 
@@ -1756,27 +1786,33 @@
                 if (!filename) continue;
 
                 const label = row[colLabel] || "";
-                const finalized = row[colFinalized] || "";
+                const finalized = isFinalized ? "Yes" : (row[colFinalized] || "");
 
-                ocrState.csvData[filename] = {
+                targetData[filename] = {
                     originalFilepath: filepath,
                     label: label,
                     finalized: finalized,
                     row: row
                 };
             }
+
+            ocrMergeCsvData();
         }
 
         async function ocrHandleDirSelect(e) {
             try {
                 const files = Array.from(e.target.files);
                 const imageExtensions = /\.(jpe?g|png|webp)$/i;
-                ocrState.allImageFiles = files.filter(f => imageExtensions.test(f.name));
+                const newImageFiles = files.filter(f => imageExtensions.test(f.name));
                 
+                for (const file of newImageFiles) {
+                    if (!ocrState.allImageFiles.some(f => f.name === file.name)) {
+                        ocrState.allImageFiles.push(file);
+                    }
+                }
+
                 if (ocrState.allImageFiles.length > 0) {
-                    const firstRelative = ocrState.allImageFiles[0].webkitRelativePath;
-                    const folderName = firstRelative ? firstRelative.split('/')[0] : "Dossier";
-                    document.getElementById('ocr-dir-status').innerText = `${folderName} (${ocrState.allImageFiles.length} images)`;
+                    document.getElementById('ocr-dir-status').innerText = `${ocrState.allImageFiles.length} images chargées`;
                 } else {
                     document.getElementById('ocr-dir-status').innerText = "Aucune image trouvée.";
                     alert("Aucune image valide (.jpg, .png, .webp) trouvée dans le dossier sélectionné.");
@@ -1794,15 +1830,75 @@
                 const file = e.target.files[0];
                 if (!file) return;
 
-                document.getElementById('ocr-csv-status').innerText = file.name;
+                if (!ocrState.loadedPreCsvNames.includes(file.name)) {
+                    ocrState.loadedPreCsvNames.push(file.name);
+                }
                 const text = await file.text();
-                ocrParseCsvContent(text);
+                ocrParseCsvContent(text, false);
+                
+                const count = Object.keys(ocrState.preCsvData).length;
+                document.getElementById('ocr-csv-status').innerText = `${ocrState.loadedPreCsvNames.join(', ')} (${count} lignes chargées)`;
                 
                 ocrFilterImages();
             } catch (err) {
                 console.error(err);
                 alert("Erreur lors de la lecture du fichier CSV.");
             }
+        }
+
+        async function ocrHandleFinalizedCsvSelect(e) {
+            try {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                if (!ocrState.loadedFinalizedCsvNames.includes(file.name)) {
+                    ocrState.loadedFinalizedCsvNames.push(file.name);
+                }
+                const text = await file.text();
+                ocrParseCsvContent(text, true);
+                
+                const count = Object.keys(ocrState.finalizedCsvData).length;
+                document.getElementById('ocr-finalized-csv-status').innerText = `${ocrState.loadedFinalizedCsvNames.join(', ')} (${count} lignes finalisées chargées)`;
+                
+                ocrFilterImages();
+            } catch (err) {
+                console.error(err);
+                alert("Erreur lors de la lecture du fichier CSV finalisé.");
+            }
+        }
+
+        function ocrClearDir() {
+            ocrState.allImageFiles = [];
+            ocrState.imageFiles = [];
+            ocrState.currentIndex = -1;
+            ocrState.currentImageElement = null;
+            ocrState.validatedImages.clear();
+            ocrCtx.clearRect(0, 0, ocrCanvas.width, ocrCanvas.height);
+            document.getElementById('ocr-dir-status').innerText = "Aucun dossier sélectionné.";
+            document.getElementById('ocr-progress-text').innerText = "0 / 0";
+            document.getElementById('ocr-validated-count').innerText = "0 images validées";
+            document.getElementById('ocr-navbar-validated-count').innerText = "0 validées";
+            document.getElementById('ocr-filename-display').innerText = "";
+            document.getElementById('ocr-text').value = "";
+            ocrState.hasUnsavedChanges = false;
+        }
+
+        function ocrClearCsv() {
+            ocrState.preCsvData = {};
+            ocrState.loadedPreCsvNames = [];
+            ocrMergeCsvData();
+            document.getElementById('ocr-csv-status').innerText = "Aucun fichier sélectionné.";
+            ocrFilterImages();
+            ocrState.hasUnsavedChanges = true;
+        }
+
+        function ocrClearFinalizedCsv() {
+            ocrState.finalizedCsvData = {};
+            ocrState.loadedFinalizedCsvNames = [];
+            ocrMergeCsvData();
+            document.getElementById('ocr-finalized-csv-status').innerText = "Aucun fichier sélectionné.";
+            ocrFilterImages();
+            ocrState.hasUnsavedChanges = true;
         }
 
         function ocrFilterImages() {
@@ -1915,6 +2011,10 @@
         function ocrEscapeCsv(val) {
             if (val === null || val === undefined) return "";
             const str = String(val);
+            // Escape long numbers to prevent Excel from converting to scientific notation (12+ digits)
+            if (/^\d{12,}$/.test(str)) {
+                return `="${str}"`;
+            }
             if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
                 return '"' + str.replace(/"/g, '""') + '"';
             }
@@ -1955,7 +2055,7 @@
                 }
             }
 
-            let data = ocrState.csvData[filename];
+            let data = ocrState.preCsvData[filename];
             if (!data) {
                 const newRow = [];
                 while (newRow.length < ocrState.csvHeaders.length) {
@@ -1965,7 +2065,7 @@
                 newRow[ocrState.colLabel] = textValue;
                 newRow[ocrState.colFinalized] = "Yes";
 
-                ocrState.csvData[filename] = {
+                ocrState.preCsvData[filename] = {
                     originalFilepath: file.webkitRelativePath || filename,
                     label: textValue,
                     finalized: "Yes",
@@ -1978,6 +2078,8 @@
                 data.row[ocrState.colFinalized] = "Yes";
             }
 
+            ocrState.validatedImages.add(filename);
+            ocrMergeCsvData();
             ocrState.hasUnsavedChanges = true;
 
             return true;
@@ -2018,20 +2120,42 @@
 
         function ocrUpdateProgress() {
             document.getElementById('ocr-progress-text').innerText = `${ocrState.currentIndex + 1} / ${ocrState.imageFiles.length}`;
+            document.getElementById('ocr-validated-count').innerText = `${ocrState.validatedImages.size} images validées`;
+            document.getElementById('ocr-navbar-validated-count').innerText = `${ocrState.validatedImages.size} validées`;
         }
 
-        function ocrDownloadCsv() {
-            const entries = Object.entries(ocrState.csvData);
-            let csvContent = "\uFEFF";
+        function ocrDownloadCsv(silent = false) {
+            let csvContent = "\uFEFF"; // BOM for UTF-8 compatibility
             csvContent += ocrState.csvHeaders.map(ocrEscapeCsv).join(',') + '\n';
             
             let rowCount = 0;
-            for (const [filename, data] of entries) {
+
+            // 1. Export finalized labels
+            const finalizedEntries = Object.entries(ocrState.finalizedCsvData);
+            for (const [filename, data] of finalizedEntries) {
+                // If this image was validated in the current session, let the validated one take precedence
+                if (ocrState.validatedImages.has(filename)) {
+                    continue;
+                }
                 if (data.label && data.label.trim() !== "") {
                     const row = [...data.row];
                     row[ocrState.colFilename] = data.originalFilepath || filename;
                     row[ocrState.colLabel] = data.label;
-                    row[ocrState.colFinalized] = data.finalized || "";
+                    row[ocrState.colFinalized] = "Yes";
+                    
+                    csvContent += row.map(ocrEscapeCsv).join(',') + '\n';
+                    rowCount++;
+                }
+            }
+
+            // 2. Export validated labels
+            for (const filename of ocrState.validatedImages) {
+                const data = ocrState.preCsvData[filename];
+                if (data && data.label && data.label.trim() !== "") {
+                    const row = [...data.row];
+                    row[ocrState.colFilename] = data.originalFilepath || filename;
+                    row[ocrState.colLabel] = data.label;
+                    row[ocrState.colFinalized] = "Yes";
                     
                     csvContent += row.map(ocrEscapeCsv).join(',') + '\n';
                     rowCount++;
@@ -2039,7 +2163,9 @@
             }
             
             if (rowCount === 0) {
-                alert("Aucun label à télécharger. Les images sans label ne sont pas incluses.");
+                if (!silent) {
+                    alert("Aucun label à télécharger. Les images sans label ou non validées ne sont pas incluses.");
+                }
                 return;
             }
 
@@ -2051,6 +2177,7 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            URL.revokeObjectURL(url);
 
             ocrState.hasUnsavedChanges = false;
         }
@@ -2071,6 +2198,10 @@
 
         document.getElementById('ocr-btn-select-dir').onclick = () => document.getElementById('ocr-dir-input').click();
         document.getElementById('ocr-btn-select-csv').onclick = () => document.getElementById('ocr-csv-input').click();
+        document.getElementById('ocr-btn-select-finalized-csv').onclick = () => document.getElementById('ocr-finalized-csv-input').click();
+        document.getElementById('ocr-btn-clear-dir').onclick = ocrClearDir;
+        document.getElementById('ocr-btn-clear-csv').onclick = ocrClearCsv;
+        document.getElementById('ocr-btn-clear-finalized-csv').onclick = ocrClearFinalizedCsv;
         document.getElementById('ocr-btn-download-csv').onclick = ocrDownloadCsv;
         document.getElementById('ocr-btn-next').onclick = ocrNextImage;
         document.getElementById('ocr-btn-skip').onclick = ocrSkipImage;
@@ -2078,6 +2209,7 @@
         
         document.getElementById('ocr-dir-input').onchange = ocrHandleDirSelect;
         document.getElementById('ocr-csv-input').onchange = ocrHandleCsvSelect;
+        document.getElementById('ocr-finalized-csv-input').onchange = ocrHandleFinalizedCsvSelect;
 
         document.getElementById('ocr-text').addEventListener('keydown', e => {
             if (e.key === 'Enter' && e.ctrlKey) {
