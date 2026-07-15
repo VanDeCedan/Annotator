@@ -344,7 +344,13 @@
             </div>
 
             <div class="section">
-                <h2>Classes</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h2 style="margin: 0; padding: 0; border: none;">Classes</h2>
+                    <div style="display: flex; gap: 5px;">
+                        <button id="btn-classes-om" class="success" style="padding: 2px 8px; font-size: 0.8rem; margin: 0; width: auto;" onclick="switchClassSet('om')">OM</button>
+                        <button id="btn-classes-cartes" style="padding: 2px 8px; font-size: 0.8rem; margin: 0; width: auto; background-color: #555;" onclick="switchClassSet('cartes')">Cartes</button>
+                    </div>
+                </div>
                 <div class="class-list" id="class-list">
                     <!-- Classes injected here -->
                 </div>
@@ -482,6 +488,28 @@
         /**
          * Application State
          */
+        const omClasses = [
+            { id: 0, name: 'STRUCTURE', color: '#ff3333' },
+            { id: 1, name: 'NOM', color: '#33ff33' },
+            { id: 2, name: 'TITRE', color: '#3333ff' },
+            { id: 3, name: 'INDICE', color: '#ffff33' },
+            { id: 4, name: 'PROVENANCEE', color: '#ff33ff' },
+            { id: 5, name: 'DATE DEPART', color: '#33ffff' },
+            { id: 6, name: 'DATE RETOUR', color: '#ff9933' },
+            { id: 7, name: 'SIGNATAIRE', color: '#9933ff' }
+        ];
+
+        const cartesClasses = [
+            { id: 0, name: 'CEDEAO', color: '#ef4444' },
+            { id: 1, name: 'CIP', color: '#f59e0b' },
+            { id: 2, name: 'CNI', color: '#10b981' },
+            { id: 3, name: 'PASSEPORT', color: '#3b82f6' },
+            { id: 4, name: 'NOM', color: '#8b5cf6' },
+            { id: 5, name: 'PRENOM', color: '#ec4899' },
+            { id: 6, name: 'NUMERO CARTE', color: '#14b8a6' },
+            { id: 7, name: 'DATE EXPIRATION', color: '#eab308' }
+        ];
+
         const state = {
             inputDirHandles: [],
             inputLabelsDirHandles: [],
@@ -490,16 +518,7 @@
             currentIndex: -1,
             currentImageElement: null,
 
-            classes: [
-                { id: 0, name: 'STRUCTURE', color: '#ff3333' },
-                { id: 1, name: 'NOM', color: '#33ff33' },
-                { id: 2, name: 'TITRE', color: '#3333ff' },
-                { id: 3, name: 'INDICE', color: '#ffff33' },
-                { id: 4, name: 'PROVENANCEE', color: '#ff33ff' },
-                { id: 5, name: 'DATE DEPART', color: '#33ffff' },
-                { id: 6, name: 'DATE RETOUR', color: '#ff9933' },
-                { id: 7, name: 'SIGNATAIRE', color: '#9933ff' }
-            ],
+            classes: JSON.parse(JSON.stringify(omClasses)),
             activeClassId: 0,
 
             annotations: {}, // filename -> array of OBBs
@@ -1051,6 +1070,27 @@
                 const count = state.annotations[filename] ? state.annotations[filename].length : 0;
                 document.getElementById('annot-count').innerText = `${count} annotations`;
             }
+        }
+
+        function switchClassSet(setName) {
+            if (setName === 'om') {
+                state.classes = JSON.parse(JSON.stringify(omClasses));
+                document.getElementById('btn-classes-om').classList.add('success');
+                document.getElementById('btn-classes-om').style.backgroundColor = '';
+                document.getElementById('btn-classes-cartes').classList.remove('success');
+                document.getElementById('btn-classes-cartes').style.backgroundColor = '#555';
+            } else if (setName === 'cartes') {
+                state.classes = JSON.parse(JSON.stringify(cartesClasses));
+                document.getElementById('btn-classes-cartes').classList.add('success');
+                document.getElementById('btn-classes-cartes').style.backgroundColor = '';
+                document.getElementById('btn-classes-om').classList.remove('success');
+                document.getElementById('btn-classes-om').style.backgroundColor = '#555';
+            }
+            if (state.classes.length > 0) {
+                state.activeClassId = state.classes[0].id;
+            }
+            updateUI();
+            stateChanged();
         }
 
         document.getElementById('btn-add-class').onclick = () => {
